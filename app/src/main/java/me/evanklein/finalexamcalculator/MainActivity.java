@@ -408,6 +408,7 @@ public class MainActivity extends AppCompatActivity {
                     else {
                         //not marked
                         currentAss.setMarked(false);
+                        currentAss.setMark(0.0);
                     }
                 } else {
                     //we have entered focus: if the number of existing rows in the activity is

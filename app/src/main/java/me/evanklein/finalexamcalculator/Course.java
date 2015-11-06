@@ -26,13 +26,16 @@ public class Course {
     public Double getMarkSoFar() {
         Double mark = 0.0;
         for (Map.Entry<Integer, Assessment> aEntry : assessments.entrySet()) {
-            mark += aEntry.getValue().getMark() * aEntry.getValue().getWorth() / 100;
+            if (aEntry.getValue().isMarked()) {
+                mark += aEntry.getValue().getMark() * aEntry.getValue().getWorth() / 100;
+            }
         }
-        if (getMarkedWorth().equals(0.0)) {
+        Double markedWorth = getMarkedWorth();
+        if (markedWorth.equals(0.0)) {
             return 0.0;
         }
         else {
-            return mark / getMarkedWorth() * 100;
+            return mark / markedWorth * 100;
         }
     }
 
@@ -84,13 +87,15 @@ public class Course {
 
     public Double getRequiredRestMark() {
         Double yetToMark;
-        if (getTotalWorth().equals(getMarkedWorth())) {
-            yetToMark = 100-getMarkedWorth();
+        Double totalWorth = getTotalWorth();
+        Double markedWorth = getMarkedWorth();
+        if (totalWorth.equals(markedWorth)) {
+            yetToMark = 100-markedWorth;
         }
         else {
-            yetToMark = getTotalWorth() - getMarkedWorth();
+            yetToMark = totalWorth - markedWorth;
         }
-        return ((desiredGrade - (getMarkSoFar() * getMarkedWorth() / 100))/yetToMark) * 100;
+        return ((desiredGrade - (getMarkSoFar() * markedWorth / 100))/yetToMark) * 100;
     }
 
     public Course() {
