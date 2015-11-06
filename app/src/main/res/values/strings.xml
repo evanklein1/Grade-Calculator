@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Final Exam Calculator</string>
+    <string name="action_settings">Settings</string>
+    <string name="type_string">Type</string>
+    <string name="your_mark_string">Your Mark</string>
+    <string name="worth_string">Worth</string>
+</resources>

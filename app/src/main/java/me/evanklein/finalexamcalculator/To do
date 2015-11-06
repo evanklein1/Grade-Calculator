@@ -1,0 +1,6 @@
+EditText fields growing as you type
+"Save Course" button
+"lock" the worths in once they are written, but able to edit
+You need a " + x + "% in the REST of the course to get a " + desiredGrade + "% in the course
+--> if only the final is unmarked, then say "you need ... on the FINAL"
+set input type on mark and worth fields
