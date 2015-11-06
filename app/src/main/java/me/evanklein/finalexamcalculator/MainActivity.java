@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        //create a database of this user's data so they can save it
+        
         //map the variable names to values
         LinearLayout linearLayout = new LinearLayout(this);
         numRows = 1;
