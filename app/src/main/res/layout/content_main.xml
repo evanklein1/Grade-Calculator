@@ -166,7 +166,7 @@
         android:layout_height="wrap_content"
         android:text="Save Course"
         android:id="@+id/save_course_button"
-        android:onClick="addToDB"
+        android:onClick="promptCourseName"
         android:layout_gravity="center_horizontal" />
 
 </LinearLayout>
