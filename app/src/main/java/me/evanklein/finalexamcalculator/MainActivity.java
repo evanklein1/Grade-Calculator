@@ -2,6 +2,7 @@ package me.evanklein.finalexamcalculator;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     Assessment a1;
     Course course;
     TableLayout tableLayout;
-    SQLiteDatabase database;
+    SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //create a database of this user's data so they can save it
-        
+        FeedReaderDBHelper mDBHelper = new FeedReaderDBHelper(getApplicationContext());
+        db = mDBHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        //add the course "COURSE NAME" and "DESIRED GRADE" to the course table
+        //add the assessments to the ass table
+        values.put(FeedReaderDBHelper.COURSE_TABLE_COURSE_COLUMN, Course.getName());
+        values.put(FeedEntry.COLUMN_NAME_TITLE, title);
+        values.put(FeedEntry.COLUMN_NAME_CONTENT, content);
+
+
         //map the variable names to values
         LinearLayout linearLayout = new LinearLayout(this);
         numRows = 1;
