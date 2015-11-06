@@ -2,8 +2,10 @@ package me.evanklein.finalexamcalculator;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -326,5 +328,27 @@ public class MainActivity extends AppCompatActivity {
                     null,
                     assValues);
         }
+    }
+
+    public void promptCourseName() {
+        //ask for course name
+        AlertDialog.Builder alert = new AlertDialog.Builder(getApplicationContext());
+        alert.setMessage("Enter the name of this course:");
+        final EditText courseNameET = new EditText(this);
+        alert.setView(courseNameET);
+        alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String courseName = courseNameET.getText().toString();
+                saveCourse(courseName);
+            }
+        });
+
+        //add to DB
+    }
+
+    public void saveCourse(String name) {
+        course.setName(name);
+        addCourseToDB();
+        addAssessmentsToDB();
     }
 }
