@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -324,6 +325,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String courseName = courseNameET.getText().toString();
                 saveCourse(courseName);
+                testDB();
                 return;
             }
         });
@@ -340,5 +342,37 @@ public class MainActivity extends AppCompatActivity {
         course.setName(name);
         addCourseToDB();
         addAssessmentsToDB();
+    }
+
+    public void testDB() {
+        FeedReaderDBHelper mDBHelper = new FeedReaderDBHelper(getApplicationContext());
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+
+// Define a projection that specifies which columns from the database
+// you will actually use after this query.
+        String[] projection = {mDBHelper.COURSE_TABLE_NAME_COLUMN};
+        String selection = "name = ?";
+        String[] selectionArgs = {course.getName()};
+
+// How you want the results sorted in the resulting Cursor
+
+        Cursor c = db.query(
+                mDBHelper.COURSE_TABLE,  // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+        c.moveToFirst();
+        String hopeCourseName = c.getString(
+                c.getColumnIndexOrThrow(mDBHelper.COURSE_TABLE_NAME_COLUMN)
+        );
+
+        TextView messageTV = (TextView) findViewById(R.id.final_message);
+        messageTV.setText(String.format
+                ("%s", hopeCourseName));
+
     }
 }
