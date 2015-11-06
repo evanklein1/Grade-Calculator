@@ -91,59 +91,60 @@ public class MainActivity extends AppCompatActivity {
 //                updateTotals();
 //            }
 //        });
-
-        yourMark1EditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                //if we just exited the type field
-                if (!hasFocus) {
-                    //change the assessment object
-                    if (!("".equals(yourMark1EditText.getText().toString()))) {
-                        a1.setMark(Double.valueOf(yourMark1EditText.getText().toString()));
-                        a1.setMarked(true);
-                    }
-                    else {
-                        //not marked
-                        a1.setMarked(false);
-                    }
-                }
-                else {
-                    //we have entered focus: if the number of existing rows in the activity is
-                    //more than current rowNum, don't do anything.
-                    if (numRows.equals(1)) {
-                        //else, create a new row (INFLATE activity)
-                        addRow(2);
-                        numRows += 1;
-                    }
-                    removeExtraRow(1, tableLayout);
-                }
-                updateTotals();
-            }
-        });
-        worth1EditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                //if we just lost focus
-                if (!hasFocus) {
-                    //change the assessment object
-                    if (!("".equals(worth1EditText.getText().toString()))) {
-
-                        a1.setWorth(Double.valueOf(worth1EditText.getText().toString()));
-                    }
-                }
-                else {
-                    //we have entered focus: if the number of existing rows in the activity is
-                    //more than current rowNum, don't do anything.
-                    if (numRows.equals(1)) {
-                        //else, create a new row (INFLATE activity)
-                        addRow(2);
-                        numRows += 1;
-                    }
-                    removeExtraRow(1, tableLayout);
-                }
-                updateTotals();
-            }
-        });
+        setMarkListener(yourMark1EditText, 1);
+//        yourMark1EditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                //if we just exited the type field
+//                if (!hasFocus) {
+//                    //change the assessment object
+//                    if (!("".equals(yourMark1EditText.getText().toString()))) {
+//                        a1.setMark(Double.valueOf(yourMark1EditText.getText().toString()));
+//                        a1.setMarked(true);
+//                    }
+//                    else {
+//                        //not marked
+//                        a1.setMarked(false);
+//                    }
+//                }
+//                else {
+//                    //we have entered focus: if the number of existing rows in the activity is
+//                    //more than current rowNum, don't do anything.
+//                    if (numRows.equals(1)) {
+//                        //else, create a new row (INFLATE activity)
+//                        addRow(2);
+//                        numRows += 1;
+//                    }
+//                    removeExtraRow(1, tableLayout);
+//                }
+//                updateTotals();
+//            }
+//        });
+        setWorthListener(worth1EditText, 1);
+//        worth1EditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                //if we just lost focus
+//                if (!hasFocus) {
+//                    //change the assessment object
+//                    if (!("".equals(worth1EditText.getText().toString()))) {
+//
+//                        a1.setWorth(Double.valueOf(worth1EditText.getText().toString()));
+//                    }
+//                }
+//                else {
+//                    //we have entered focus: if the number of existing rows in the activity is
+//                    //more than current rowNum, don't do anything.
+//                    if (numRows.equals(1)) {
+//                        //else, create a new row (INFLATE activity)
+//                        addRow(2);
+//                        numRows += 1;
+//                    }
+//                    removeExtraRow(1, tableLayout);
+//                }
+//                updateTotals();
+//            }
+//        });
 
         setDesiredGradeListener();
         setTouchListener();
@@ -265,31 +266,32 @@ public class MainActivity extends AppCompatActivity {
 //                updateTotals();
 //            }
 //        });
-        newWorth.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                //if we just exited the type field
-                if (!hasFocus) {
-                    //change the assessment object
-                    //check if assessment is empty
-                    if (!("".equals(newWorth.getText().toString()))) {
-                        course.addAssessment(currentRowNum).setWorth(Double.valueOf(newWorth.getText().toString()));
-                    }
-                } else {
-                    //we have entered focus: if the number of existing rows in the activity is
-                    //more than current rowNum, don't do anything.
-                    if (numRows.equals(currentRowNum)) {
-                        //else, create a new row (INFLATE activity)
-                        addRow(currentRowNum + 1);
-                        numRows += 1;
-                    }
-                    removeExtraRow(currentRowNum, tableLayout);
-                }
-                //either way, want to update the mark so far (or just make sure it's up to date
-                //and the worth so far
-                updateTotals();
-            }
-        });
+        setWorthListener(newWorth, currentRowNum);
+//        newWorth.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                //if we just exited the type field
+//                if (!hasFocus) {
+//                    //change the assessment object
+//                    //check if assessment is empty
+//                    if (!("".equals(newWorth.getText().toString()))) {
+//                        course.addAssessment(currentRowNum).setWorth(Double.valueOf(newWorth.getText().toString()));
+//                    }
+//                } else {
+//                    //we have entered focus: if the number of existing rows in the activity is
+//                    //more than current rowNum, don't do anything.
+//                    if (numRows.equals(currentRowNum)) {
+//                        //else, create a new row (INFLATE activity)
+//                        addRow(currentRowNum + 1);
+//                        numRows += 1;
+//                    }
+//                    removeExtraRow(currentRowNum, tableLayout);
+//                }
+//                //either way, want to update the mark so far (or just make sure it's up to date
+//                //and the worth so far
+//                updateTotals();
+//            }
+//        });
         tableRow.addView(newType);
         tableRow.addView(newYourMark);
         tableRow.addView(newWorth);
@@ -417,6 +419,35 @@ public class MainActivity extends AppCompatActivity {
                     }
                     removeExtraRow(currentRowNum, tableLayout);
                 }
+                updateTotals();
+            }
+        });
+    }
+
+    public void setWorthListener(final EditText worthET, Integer rowNum) {
+        final Integer currentRowNum = rowNum;
+        worthET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                //if we just exited the type field
+                if (!hasFocus) {
+                    //change the assessment object
+                    //check if assessment is empty
+                    if (!("".equals(worthET.getText().toString()))) {
+                        course.addAssessment(currentRowNum).setWorth(Double.valueOf(worthET.getText().toString()));
+                    }
+                } else {
+                    //we have entered focus: if the number of existing rows in the activity is
+                    //more than current rowNum, don't do anything.
+                    if (numRows.equals(currentRowNum)) {
+                        //else, create a new row (INFLATE activity)
+                        addRow(currentRowNum + 1);
+                        numRows += 1;
+                    }
+                    removeExtraRow(currentRowNum, tableLayout);
+                }
+                //either way, want to update the mark so far (or just make sure it's up to date
+                //and the worth so far
                 updateTotals();
             }
         });
