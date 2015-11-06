@@ -8,8 +8,6 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
@@ -345,19 +343,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void testDB() {
-        FeedReaderDBHelper mDBHelper = new FeedReaderDBHelper(getApplicationContext());
-        SQLiteDatabase db = mDBHelper.getReadableDatabase();
-
 // Define a projection that specifies which columns from the database
 // you will actually use after this query.
-        String[] projection = {mDBHelper.COURSE_TABLE_NAME_COLUMN};
+        String[] projection = {FeedReaderDBHelper.COURSE_TABLE_NAME_COLUMN};
         String selection = "name = ?";
         String[] selectionArgs = {course.getName()};
 
 // How you want the results sorted in the resulting Cursor
 
         Cursor c = db.query(
-                mDBHelper.COURSE_TABLE,  // The table to query
+                FeedReaderDBHelper.COURSE_TABLE,  // The table to query
                 projection,                               // The columns to return
                 selection,                                // The columns for the WHERE clause
                 selectionArgs,                            // The values for the WHERE clause
@@ -367,7 +362,7 @@ public class MainActivity extends AppCompatActivity {
         );
         c.moveToFirst();
         String hopeCourseName = c.getString(
-                c.getColumnIndexOrThrow(mDBHelper.COURSE_TABLE_NAME_COLUMN)
+                c.getColumnIndexOrThrow(FeedReaderDBHelper.COURSE_TABLE_NAME_COLUMN)
         );
 
         TextView messageTV = (TextView) findViewById(R.id.final_message);
