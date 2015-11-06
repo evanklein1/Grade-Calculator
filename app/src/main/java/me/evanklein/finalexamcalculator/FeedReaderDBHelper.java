@@ -11,7 +11,10 @@ public class FeedReaderDBHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "grade_calculator.db";
-    public static final String COURSE_TABLE_COURSE_COLUMN = "course";
+    public static final String COURSE_TABLE = "course";
+    public static final String ASS_TABLE = "assessment";
+
+    public static final String COURSE_TABLE_NAME_COLUMN = "name";
     public static final String COURSE_TABLE_DESIRED_GRADE_COLUMN = "desired_grade";
     public static final String ASS_TABLE_TYPE_COLUMN = "type";
     public static final String ASS_TABLE_MARK_COLUMN = "mark";
@@ -24,7 +27,7 @@ public class FeedReaderDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String courses_table = "CREATE TABLE course (Name varchar(255), desired_grade float);";
         String assessment_table =
-                "CREATE TABLE assessment (type varchar(255), mark float, marked boolean, worth float);";
+                "CREATE TABLE " + ASS_TABLE + " (type varchar(255), mark float, marked boolean, worth float);";
         db.execSQL(courses_table);
         db.execSQL(assessment_table);
     }

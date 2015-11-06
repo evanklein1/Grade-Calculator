@@ -7,10 +7,18 @@ import java.util.Map;
  * Created by Evan on 01/11/2015.
  */
 public class Course {
+
     private String name;
     private HashMap<Integer, Assessment> assessments;
     private Double desiredGrade;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public Double getDesiredGrade() {
         return desiredGrade;

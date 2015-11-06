@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,16 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        //create a database of this user's data so they can save it
-        FeedReaderDBHelper mDBHelper = new FeedReaderDBHelper(getApplicationContext());
-        db = mDBHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        //add the course "COURSE NAME" and "DESIRED GRADE" to the course table
-        //add the assessments to the ass table
-        values.put(FeedReaderDBHelper.COURSE_TABLE_COURSE_COLUMN, Course.getName());
-        values.put(FeedEntry.COLUMN_NAME_TITLE, title);
-        values.put(FeedEntry.COLUMN_NAME_CONTENT, content);
-
 
         //map the variable names to values
         LinearLayout linearLayout = new LinearLayout(this);
@@ -75,8 +66,8 @@ public class MainActivity extends AppCompatActivity {
 
         tableLayout = (TableLayout) findViewById(R.id.table_home);
         //create an Assessment object for the 1st row
-        course.addAssessment(1);
-        a1 = course.getAssessment(1);
+//        course.addAssessment(1);
+//        a1 = course.getAssessment(1);
         final EditText type1EditText = (EditText) findViewById(R.id.type_1);
         final EditText yourMark1EditText = (EditText) findViewById(R.id.your_mark_1);
         final EditText worth1EditText = (EditText) findViewById(R.id.worth_1);
@@ -305,5 +296,35 @@ public class MainActivity extends AppCompatActivity {
     public void hideKeyboard(View view) {
         InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public void addCourseToDB() {
+        //create a database of this user's data so they can save it
+        FeedReaderDBHelper mDBHelper = new FeedReaderDBHelper(getApplicationContext());
+        db = mDBHelper.getWritableDatabase();
+        ContentValues courseValues = new ContentValues();
+        //add the course "COURSE NAME" and "DESIRED GRADE" to the course table
+        courseValues.put(FeedReaderDBHelper.COURSE_TABLE_NAME_COLUMN, course.getName());
+        courseValues.put(FeedReaderDBHelper.COURSE_TABLE_DESIRED_GRADE_COLUMN, course.getDesiredGrade());
+        db.insert(
+                FeedReaderDBHelper.COURSE_TABLE,
+                null,
+                courseValues);
+    }
+
+    public void addAssessmentsToDB() {
+        //add the assessments to the ass table
+        for (Map.Entry<Integer, Assessment> aEntry : course.getAssessments().entrySet()) {
+            ContentValues assValues = new ContentValues();
+            Assessment a = aEntry.getValue();
+            assValues.put(FeedReaderDBHelper.ASS_TABLE_TYPE_COLUMN, a.getType());
+            assValues.put(FeedReaderDBHelper.ASS_TABLE_MARK_COLUMN, a.getMark());
+            assValues.put(FeedReaderDBHelper.ASS_TABLE_MARKED_COLUMN, a.isMarked());
+            assValues.put(FeedReaderDBHelper.ASS_TABLE_WORTH_COLUMN, a.getWorth());
+            db.insert(
+                    FeedReaderDBHelper.ASS_TABLE,
+                    null,
+                    assValues);
+        }
     }
 }
