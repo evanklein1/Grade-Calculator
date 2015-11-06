@@ -25,7 +25,7 @@ public class FeedReaderDBHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     public void onCreate(SQLiteDatabase db) {
-        String courses_table = "CREATE TABLE course (Name varchar(255), desired_grade float);";
+        String courses_table = "CREATE TABLE course (name varchar(255), desired_grade float);";
         String assessment_table =
                 "CREATE TABLE " + ASS_TABLE + " (type varchar(255), mark float, marked boolean, worth float);";
         db.execSQL(courses_table);
