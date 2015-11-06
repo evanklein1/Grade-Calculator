@@ -316,22 +316,24 @@ public class MainActivity extends AppCompatActivity {
 
     public void promptCourseName(View view) {
         //ask for course name
-        AlertDialog.Builder alert = new AlertDialog.Builder(getApplicationContext());
-        alert.setMessage("Enter the name of this course:");
+        AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
+        alertDB.setMessage("Enter the name of this course:");
         final EditText courseNameET = new EditText(this);
-        alert.setView(courseNameET);
-        alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+        alertDB.setView(courseNameET);
+        alertDB.setPositiveButton("Save", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String courseName = courseNameET.getText().toString();
                 saveCourse(courseName);
                 return;
             }
         });
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 return;
             }
         });
+        AlertDialog alert = alertDB.create();
+        alert.show();
     }
 
     public void saveCourse(String name) {
