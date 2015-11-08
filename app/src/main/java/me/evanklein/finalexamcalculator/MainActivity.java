@@ -250,6 +250,9 @@ public class MainActivity extends AppCompatActivity {
                     if (!("".equals(worthET.getText().toString()))) {
                         course.addAssessment(currentRowNum).setWorth(Double.valueOf(worthET.getText().toString()));
                     }
+                    else {
+                        course.getAssessment(currentRowNum).setWorth(0.0);
+                    }
                 } else {
                     //we have entered focus: if the number of existing rows in the activity is
                     //more than current rowNum, don't do anything.
