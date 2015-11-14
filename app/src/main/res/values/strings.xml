@@ -4,4 +4,8 @@
     <string name="type_string">Type</string>
     <string name="your_mark_string">Your Mark (%)</string>
     <string name="worth_string">Worth (%)</string>
+    <string name="title_activity_saved_courses">SavedCoursesActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
