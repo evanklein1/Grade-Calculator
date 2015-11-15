@@ -12,5 +12,9 @@ reload course from database
 sidebar where you can see all your saved courses
 GPA page where you can see your average/GPA for all your courses
 
-
+saving assessments to database
+adding course to sidebar
+reloading course from database
+displaying course info on home page
+fixing action bar
 
