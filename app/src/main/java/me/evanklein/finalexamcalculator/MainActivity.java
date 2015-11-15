@@ -60,11 +60,11 @@ public class MainActivity extends AppCompatActivity {
         // Set the list's click listener
         //mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         //map the variable names to values
-        numRows = 1;
-        editTextMap = new HashMap<String, EditText>();
-        editTextMap.put("type_1", (EditText) findViewById(R.id.type_1));
-        editTextMap.put("your_mark_1", (EditText) findViewById(R.id.your_mark_1));
-        editTextMap.put("worth_1", (EditText) findViewById(R.id.worth_1));
+//        numRows = 1;
+//        editTextMap = new HashMap<String, EditText>();
+//        editTextMap.put("type_1", (EditText) findViewById(R.id.type_1));
+//        editTextMap.put("your_mark_1", (EditText) findViewById(R.id.your_mark_1));
+//        editTextMap.put("worth_1", (EditText) findViewById(R.id.worth_1));
 
         tableLayout = (TableLayout) findViewById(R.id.table_home);
         //create an Assessment object for the 1st row

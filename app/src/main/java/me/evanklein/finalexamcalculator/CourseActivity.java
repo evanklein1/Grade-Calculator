@@ -76,6 +76,8 @@ public class CourseActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        tableLayout = (TableLayout) findViewById(R.id.table_home);
+
         mDbHelper = new DBHelper(getApplicationContext());
         db = mDbHelper.getWritableDatabase();
         mDataSource = new AssessmentDataSource(db);
@@ -89,8 +91,21 @@ public class CourseActivity extends AppCompatActivity
 //        DBHelper helper = new DBHelper(this);
 //        SQLiteDatabase database = helper.getWritableDatabase();
 //        CourseDataSource dataSource = new CourseDataSource(database);
-        List<Assessment> assessments = mDataSource.read();
-        //now we want to iterate through all the assessments and display them in a table layout
+
+        //get the course name which has been passed to you
+        Bundle extras = getIntent().getExtras();
+        String courseName;
+
+        if (extras == null) {
+            //the user is entering information for a NEW course, maybe
+        }
+        else {
+            courseName = extras.getString("courseName");
+            String[] whereArgs = new String[] {courseName};
+            List<Assessment> assessments = mDataSource.read("course = ?", whereArgs, null, null, "id");
+            //now we want to iterate through all the assessments and display them in a table layout
+            displayAssessments(assessments);
+        }
 
         mDbHelper.close();
         db.close();
@@ -180,16 +195,11 @@ public class CourseActivity extends AppCompatActivity
         return true;
     }
 
-    public void loadAssessments() {
-
-    }
-
     public void displayAssessments(List<Assessment> assessments) {
         //for assessment in list
         for(int i = 0; i < assessments.size(); i++) {
             addRow(i, assessments.get(i));
         }
-
     }
     private void disableEditText(EditText editText) {
         editText.setFocusable(false);
