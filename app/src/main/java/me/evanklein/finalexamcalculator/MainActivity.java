@@ -305,14 +305,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void addCourseToDB() {
         //create a database of this user's data so they can save it
-        FeedReaderDBHelper mDBHelper = new FeedReaderDBHelper(getApplicationContext());
+        DBHelper mDBHelper = new DBHelper(getApplicationContext());
         db = mDBHelper.getWritableDatabase();
         ContentValues courseValues = new ContentValues();
         //add the course "COURSE NAME" and "DESIRED GRADE" to the course table
-        courseValues.put(FeedReaderDBHelper.COURSE_TABLE_NAME_COLUMN, course.getName());
-        courseValues.put(FeedReaderDBHelper.COURSE_TABLE_DESIRED_GRADE_COLUMN, course.getDesiredGrade());
+        courseValues.put(DBHelper.COURSE_TABLE_NAME_COLUMN, course.getName());
+        courseValues.put(DBHelper.COURSE_TABLE_DESIRED_GRADE_COLUMN, course.getDesiredGrade());
         db.insert(
-                FeedReaderDBHelper.COURSE_TABLE,
+                DBHelper.COURSE_TABLE,
                 null,
                 courseValues);
     }
@@ -322,12 +322,12 @@ public class MainActivity extends AppCompatActivity {
         for (Map.Entry<Integer, Assessment> aEntry : course.getAssessments().entrySet()) {
             ContentValues assValues = new ContentValues();
             Assessment a = aEntry.getValue();
-            assValues.put(FeedReaderDBHelper.ASS_TABLE_TYPE_COLUMN, a.getType());
-            assValues.put(FeedReaderDBHelper.ASS_TABLE_MARK_COLUMN, a.getMark());
-            assValues.put(FeedReaderDBHelper.ASS_TABLE_MARKED_COLUMN, a.isMarked());
-            assValues.put(FeedReaderDBHelper.ASS_TABLE_WORTH_COLUMN, a.getWorth());
+            assValues.put(DBHelper.ASS_TABLE_TYPE_COLUMN, a.getType());
+            assValues.put(DBHelper.ASS_TABLE_MARK_COLUMN, a.getMark());
+            assValues.put(DBHelper.ASS_TABLE_MARKED_COLUMN, a.isMarked());
+            assValues.put(DBHelper.ASS_TABLE_WORTH_COLUMN, a.getWorth());
             db.insert(
-                    FeedReaderDBHelper.ASS_TABLE,
+                    DBHelper.ASS_TABLE,
                     null,
                     assValues);
         }
@@ -376,14 +376,14 @@ public class MainActivity extends AppCompatActivity {
     public void testDB() {
 // Define a projection that specifies which columns from the database
 // you will actually use after this query.
-        String[] projection = {FeedReaderDBHelper.COURSE_TABLE_NAME_COLUMN};
+        String[] projection = {DBHelper.COURSE_TABLE_NAME_COLUMN};
         String selection = "name = ?";
         String[] selectionArgs = {course.getName()};
 
 // How you want the results sorted in the resulting Cursor
 
         Cursor c = db.query(
-                FeedReaderDBHelper.COURSE_TABLE,  // The table to query
+                DBHelper.COURSE_TABLE,  // The table to query
                 projection,                               // The columns to return
                 selection,                                // The columns for the WHERE clause
                 selectionArgs,                            // The values for the WHERE clause
@@ -393,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
         );
         c.moveToFirst();
         String hopeCourseName = c.getString(
-                c.getColumnIndexOrThrow(FeedReaderDBHelper.COURSE_TABLE_NAME_COLUMN)
+                c.getColumnIndexOrThrow(DBHelper.COURSE_TABLE_NAME_COLUMN)
         );
 
         TextView messageTV = (TextView) findViewById(R.id.final_message);

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 /**
  * Created by Evan on 06/11/2015.
  */
-public class FeedReaderDBHelper extends SQLiteOpenHelper {
+public class DBHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "grade_calculator.db";
@@ -21,7 +21,7 @@ public class FeedReaderDBHelper extends SQLiteOpenHelper {
     public static final String ASS_TABLE_MARKED_COLUMN = "marked";
     public static final String ASS_TABLE_WORTH_COLUMN = "worth";
 
-    public FeedReaderDBHelper(Context context) {
+    public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     public void onCreate(SQLiteDatabase db) {

@@ -43,7 +43,17 @@ public class CourseActivity extends AppCompatActivity
 
         //when a course activity is started, we need to get the name of the course, and load all of
         //its assessments from the database
-
+        DbHelper helper = new DbHelper(this);
+        SQLiteDatabase database = helper.getWritableDatabase();
+        TestDataSource dataSource = new TestDataSource(database);
+        List list = dataSource.read();
+        if(list == null || list.size() == 0){
+            dataSource.insert(new Test("Samik"));
+            dataSource.insert(new Test("Piyas"));
+            dataSource.insert(new Test("Sujal"));
+        }
+        helper.close();
+        database.close();
     }
 
     @Override
