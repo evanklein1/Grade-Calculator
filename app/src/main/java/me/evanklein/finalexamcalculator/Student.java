@@ -14,10 +14,27 @@ public class Student {
         return courses;
     }
 
+    //create an object of SingleObject
+    private static Student instance = new Student();
+
+    //make the constructor private so that this class cannot be
+    //instantiated
+    private Student(){}
+
+    //Get the only object available
+    public static Student getInstance(){
+        return instance;
+    }
     public void setCourses(ArrayList<Course> courses) {
         this.courses = courses;
     }
 
+    public void addCourse(Course course) {
+        courses.add(course);
+    }
+    public void removeCourse(Course course) {
+        courses.remove(course);
+    }
     public double getDesiredAverage() {
         return desiredAverage;
     }

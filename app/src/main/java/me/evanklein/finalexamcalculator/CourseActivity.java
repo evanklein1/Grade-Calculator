@@ -39,7 +39,6 @@ import java.util.Map;
 public class CourseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<List<Assessment>> {
 
-    private ArrayAdapter mAdapter;
     // The Loader's id (this id is specific to the ListFragment's LoaderManager)
     private static final int LOADER_ID = 1;
     private  static final boolean DEBUG = true;
@@ -51,8 +50,10 @@ public class CourseActivity extends AppCompatActivity
     private Course course;
     private TableLayout tableLayout;
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
     private Boolean newCourse;
+    private ListView mDrawerList;
+    private ArrayAdapter<String> mAdapter;
+    private Student student;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +61,7 @@ public class CourseActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
 
+        mDrawerList = (ListView)findViewById(R.id.navList);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -70,6 +72,10 @@ public class CourseActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         tableLayout = (TableLayout) findViewById(R.id.table_home);
+
+
+        //set the student object
+        Student student = Student.getInstance();
 
         mDbHelper = new DBHelper(getApplicationContext());
         db = mDbHelper.getWritableDatabase();
@@ -115,6 +121,9 @@ public class CourseActivity extends AppCompatActivity
         }
         setDesiredGradeListener();
         setTouchListener();
+
+        //set sidebar items
+        addDrawerItems();
     }
 
     @Override
@@ -127,7 +136,7 @@ public class CourseActivity extends AppCompatActivity
     public void onLoadFinished(Loader<List<Assessment>> loader, List<Assessment> data) {
 //        mAdapter.clear();
         for(int i = 0; i < data.size(); i++){
-            mAdapter.add(data.get(i));
+            //mAdapter.add(data.get(i));
         }
     }
     @Override
@@ -367,8 +376,7 @@ public class CourseActivity extends AppCompatActivity
                     //check if assessment is empty
                     if (!("".equals(worthET.getText().toString()))) {
                         course.addAssessment(currentRowNum).setWorth(Double.valueOf(worthET.getText().toString()));
-                    }
-                    else {
+                    } else {
                         course.getAssessment(currentRowNum).setWorth(0.0);
                     }
                 } else {
@@ -438,8 +446,8 @@ public class CourseActivity extends AppCompatActivity
         }
     }
 
-    public void saveCourse(String name) {
-        course.setName(name);
+    public void saveCourse() {
+        student.addCourse(course);
         if (newCourse) {
             addCourseToDB();
             addAssessmentsToDB();
@@ -447,7 +455,7 @@ public class CourseActivity extends AppCompatActivity
         else {
             //updateCourse
         }
-
+        addDrawerItems();
         //add course to sidebar
 //        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 //        mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -458,6 +466,16 @@ public class CourseActivity extends AppCompatActivity
 //                R.layout.nav_bar_layout, mCourses));
 //        // Set the list's click listener
 //        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+    }
+    private void addDrawerItems() {
+        ArrayList<Course> courses = student.getCourses();
+        String[] courseNames = new String[courses.size()];
+
+        for (int i = 0; i < courses.size(); i++) {
+            courseNames[i] = courses.get(i).getName();
+        }
+        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courseNames);
+        mDrawerList.setAdapter(mAdapter);
     }
 
 
