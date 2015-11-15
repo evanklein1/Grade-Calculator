@@ -105,6 +105,7 @@ public class CourseActivity extends AppCompatActivity
                 setTypeListener(type1EditText, 1);
                 setMarkListener(yourMark1EditText, 1);
                 setWorthListener(worth1EditText, 1);
+                numRows += 1;
             }
             else {
                 //now we want to iterate through all the assessments and display them in a table layout
@@ -268,7 +269,8 @@ public class CourseActivity extends AppCompatActivity
     }
 
     public void removeExtraRows(Integer currentRowNum, TableLayout tableLayout) {
-        while (course.getAssessment(numRows-1).isEmpty() && (numRows - 1 > currentRowNum)) {
+        while (course.getAssessment(numRows-1) != null && course.getAssessment(numRows-1).isEmpty()
+                && (numRows - 1 > currentRowNum)) {
             tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(numRows)));
             course.removeAssessment(numRows);
             numRows -= 1;
@@ -434,30 +436,6 @@ public class CourseActivity extends AppCompatActivity
                     null,
                     assValues);
         }
-    }
-
-    public void promptCourseName(View view) {
-        //ask for course name
-        AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
-        alertDB.setMessage("Enter the name of this course:");
-        final EditText courseNameET = new EditText(this);
-        alertDB.setView(courseNameET);
-        alertDB.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String courseName = courseNameET.getText().toString();
-                saveCourse(courseName);
-                return;
-            }
-        });
-        alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                return;
-            }
-        });
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-        AlertDialog alert = alertDB.create();
-        alert.show();
     }
 
     public void saveCourse(String name) {
