@@ -19,11 +19,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SavedCoursesActivity"
-            android:label="@string/title_activity_saved_courses"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
-        <activity
             android:name=".CourseActivity"
             android:label="@string/title_activity_course"
             android:parentActivityName=".MainActivity"

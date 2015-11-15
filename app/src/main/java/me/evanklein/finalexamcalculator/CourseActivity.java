@@ -90,9 +90,6 @@ public class CourseActivity extends AppCompatActivity
         //when a course activity is started, we need to get the name of the course, and load all of
         //its assessments from the database
         //reads courses from db
-//        DBHelper helper = new DBHelper(this);
-//        SQLiteDatabase database = helper.getWritableDatabase();
-//        CourseDataSource dataSource = new CourseDataSource(database);
 
         //get the course name which has been passed to you
         Bundle extras = getIntent().getExtras();
