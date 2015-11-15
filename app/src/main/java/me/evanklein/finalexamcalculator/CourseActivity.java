@@ -135,14 +135,14 @@ public class CourseActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<List<Assessment>> loader, List<Assessment> data) {
-        mAdapter.clear();
+//        mAdapter.clear();
         for(int i = 0; i < data.size(); i++){
             mAdapter.add(data.get(i));
         }
     }
     @Override
     public void onLoaderReset(Loader<List<Assessment>> arg0) {
-        mAdapter.clear();
+        //mAdapter.clear();
     }
     @Override
     public void onDestroy() {
