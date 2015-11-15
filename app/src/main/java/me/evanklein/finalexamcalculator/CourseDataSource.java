@@ -16,7 +16,7 @@ public class CourseDataSource extends DataSource<Course> {
     // Database creation sql statement
     public static final String CREATE_COMMAND = "create table " + TABLE_NAME
             + "(" + COLUMN_NAME + " text not null, "
-            + COLUMN_NAME + " float);";
+            + COLUMN_DESIRED_GRADE + " float);";
     public CourseDataSource(SQLiteDatabase database) {
         super(database);
     }
