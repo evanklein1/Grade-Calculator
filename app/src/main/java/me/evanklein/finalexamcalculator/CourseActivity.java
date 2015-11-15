@@ -2,16 +2,16 @@ package me.evanklein.finalexamcalculator;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Loader;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -101,6 +101,9 @@ public class CourseActivity extends AppCompatActivity
         }
         else {
             courseName = extras.getString(MainActivity.COURSE_NAME);
+            //create a new Course to be used for this activity, set its name
+            course = new Course();
+            course.setName(courseName);
             String[] whereArgs = new String[] {courseName};
             List<Assessment> assessments = mDataSource.read("course = ?", whereArgs, null, null, "id");
             //if assessments is empty, this is a new course
@@ -125,15 +128,16 @@ public class CourseActivity extends AppCompatActivity
 
     @Override
     public Loader<List> onCreateLoader(int id, Bundle args) {
-        AssessmentLoader loader = new AssessmentLoader(getApplicationContext(), mDataSource, null, null, null, null, null);
+        AbstractDataLoader<List> loader = new AssessmentLoader(getApplicationContext(), mDataSource, null, null, null, null, null);
         return loader;
     }
+
     @Override
-    public void onLoadFinished(Loader<List<Assessment>> loader, List<Assessment> data) {
+    public void onLoadFinished(Loader<List> loader, List data) {
         if (DEBUG) Log.i(TAG, "+++ onLoadFinished() called! +++");
         mAdapter.clear();
-        for(Assessment assessment : data){
-            mAdapter.add(assessment);
+        for(int i = 0; i < data.size(); i++){
+            mAdapter.add(data.get(i));
         }
     }
     @Override
