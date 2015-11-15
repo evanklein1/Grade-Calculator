@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     SQLiteDatabase db;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
+    final static String COURSE_NAME = "courseName";
 
 
     @Override
@@ -52,32 +54,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-        List<String> courses = new ArrayList<String>();
-        courses.add(course.getName());
-        // Set the adapter for the list view
-        mDrawerList.setAdapter(new ArrayAdapter<String>(getApplicationContext(),
-                R.layout.nav_bar_layout, courses));
-        // Set the list's click listener
-        //mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-        //map the variable names to values
-//        numRows = 1;
-//        editTextMap = new HashMap<String, EditText>();
-//        editTextMap.put("type_1", (EditText) findViewById(R.id.type_1));
-//        editTextMap.put("your_mark_1", (EditText) findViewById(R.id.your_mark_1));
-//        editTextMap.put("worth_1", (EditText) findViewById(R.id.worth_1));
-
         tableLayout = (TableLayout) findViewById(R.id.table_home);
-        //create an Assessment object for the 1st row
-//        course.addAssessment(1);
-//        a1 = course.getAssessment(1);
-        final EditText type1EditText = (EditText) findViewById(R.id.type_1);
-        final EditText yourMark1EditText = (EditText) findViewById(R.id.your_mark_1);
-        final EditText worth1EditText = (EditText) findViewById(R.id.worth_1);
-        setTypeListener(type1EditText, 1);
-        setMarkListener(yourMark1EditText, 1);
-        setWorthListener(worth1EditText, 1);
-        setDesiredGradeListener();
-        setTouchListener();
     }
 
     @Override
@@ -336,14 +313,15 @@ public class MainActivity extends AppCompatActivity {
     public void promptCourseName(View view) {
         //ask for course name
         AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
-        alertDB.setMessage("Enter the name of this course:");
+        alertDB.setMessage("Enter the name of the course:");
         final EditText courseNameET = new EditText(this);
         alertDB.setView(courseNameET);
-        alertDB.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+        alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String courseName = courseNameET.getText().toString();
-                saveCourse(courseName);
-                testDB();
+                Intent i = new Intent(MainActivity.this, CourseActivity.class);
+                i.putExtra(COURSE_NAME, courseName);
+                startActivity(i);
                 return;
             }
         });
@@ -373,32 +351,41 @@ public class MainActivity extends AppCompatActivity {
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
     }
 
-    public void testDB() {
-// Define a projection that specifies which columns from the database
-// you will actually use after this query.
-        String[] projection = {DBHelper.COURSE_TABLE_NAME_COLUMN};
-        String selection = "name = ?";
-        String[] selectionArgs = {course.getName()};
+//    public void testDB() {
+//// Define a projection that specifies which columns from the database
+//// you will actually use after this query.
+//        String[] projection = {DBHelper.COURSE_TABLE_NAME_COLUMN};
+//        String selection = "name = ?";
+//        String[] selectionArgs = {course.getName()};
+//
+//// How you want the results sorted in the resulting Cursor
+//
+//        Cursor c = db.query(
+//                DBHelper.COURSE_TABLE,  // The table to query
+//                projection,                               // The columns to return
+//                selection,                                // The columns for the WHERE clause
+//                selectionArgs,                            // The values for the WHERE clause
+//                null,                                     // don't group the rows
+//                null,                                     // don't filter by row groups
+//                null                                 // The sort order
+//        );
+//        c.moveToFirst();
+//        String hopeCourseName = c.getString(
+//                c.getColumnIndexOrThrow(DBHelper.COURSE_TABLE_NAME_COLUMN)
+//        );
+//
+//        TextView messageTV = (TextView) findViewById(R.id.final_message);
+//        messageTV.setText(String.format
+//                ("%s", hopeCourseName));
+//
+//    }
 
-// How you want the results sorted in the resulting Cursor
-
-        Cursor c = db.query(
-                DBHelper.COURSE_TABLE,  // The table to query
-                projection,                               // The columns to return
-                selection,                                // The columns for the WHERE clause
-                selectionArgs,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
-        );
-        c.moveToFirst();
-        String hopeCourseName = c.getString(
-                c.getColumnIndexOrThrow(DBHelper.COURSE_TABLE_NAME_COLUMN)
-        );
-
-        TextView messageTV = (TextView) findViewById(R.id.final_message);
-        messageTV.setText(String.format
-                ("%s", hopeCourseName));
-
+    public void editCourse(View view) {
+        TableRow tableRow = (TableRow) view.getParent();
+        TextView courseNameTV = (TextView) tableRow.getChildAt(0);
+        String courseName = courseNameTV.toString();
+        Intent i = new Intent(this, CourseActivity.class);
+        i.putExtra(COURSE_NAME, courseName);
+        startActivity(i);
     }
 }

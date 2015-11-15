@@ -100,13 +100,25 @@ public class CourseActivity extends AppCompatActivity
             //the user is entering information for a NEW course, maybe
         }
         else {
-            courseName = extras.getString("courseName");
+            courseName = extras.getString(MainActivity.COURSE_NAME);
             String[] whereArgs = new String[] {courseName};
             List<Assessment> assessments = mDataSource.read("course = ?", whereArgs, null, null, "id");
-            //now we want to iterate through all the assessments and display them in a table layout
-            displayAssessments(assessments);
+            //if assessments is empty, this is a new course
+            if (assessments.size() == 0) {
+                final EditText type1EditText = (EditText) findViewById(R.id.type_1);
+                final EditText yourMark1EditText = (EditText) findViewById(R.id.your_mark_1);
+                final EditText worth1EditText = (EditText) findViewById(R.id.worth_1);
+                setTypeListener(type1EditText, 1);
+                setMarkListener(yourMark1EditText, 1);
+                setWorthListener(worth1EditText, 1);
+            }
+            else {
+                //now we want to iterate through all the assessments and display them in a table layout
+                displayAssessments(assessments);
+            }
         }
-
+        setDesiredGradeListener();
+        setTouchListener();
         mDbHelper.close();
         db.close();
     }
@@ -196,7 +208,7 @@ public class CourseActivity extends AppCompatActivity
     }
 
     public void displayAssessments(List<Assessment> assessments) {
-        //for assessment in list
+        //if assessments is empty, this is a new course
         for(int i = 0; i < assessments.size(); i++) {
             addRow(i, assessments.get(i));
         }
