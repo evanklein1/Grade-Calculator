@@ -1,11 +1,16 @@
 package me.evanklein.finalexamcalculator;
 
 import android.app.AlertDialog;
+import android.app.LoaderManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -19,15 +24,21 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Course>>{
     Course course;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     final static String COURSE_NAME = "courseName";
     private Student student;
     private ArrayAdapter<String> mAdapter;
+    private SQLiteDatabase db;
+    private AssessmentDataSource mDataSource;
+    private DBHelper mDbHelper;
+    private static final int LOADER_ID = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +49,52 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
+        mDbHelper = new DBHelper(getApplicationContext());
+        db = mDbHelper.getWritableDatabase();
+        mDataSource = new AssessmentDataSource(db);
 
+        // Initialize a Loader with id '1'. If the Loader with this id already
+        // exists, then the LoaderManager will reuse the existing Loader.
+        getLoaderManager().initLoader(LOADER_ID, null, this);
         //initialize a student object, which is a singleton class and represents the student using
         //the app
         student = Student.getInstance();
         addDrawerItems();
 
     }
+
+    @Override
+    public Loader<List<Course>> onCreateLoader(int id, Bundle args) {
+        CourseLoader loader = new CourseLoader(getApplicationContext(), mDataSource, null, null, null, null, null);
+        return loader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Assessment>> loader, List<Assessment> data) {
+//        mAdapter.clear();
+        for(int i = 0; i < data.size(); i++){
+            //mAdapter.add(data.get(i));
+        }
+    }
+    @Override
+    public void onLoaderReset(Loader<List<Assessment>> arg0) {
+        //mAdapter.clear();
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDbHelper.close();
+        db.close();
+        mDataSource = null;
+        mDbHelper = null;
+        db = null;
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
