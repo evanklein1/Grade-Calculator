@@ -487,15 +487,15 @@ public class CourseActivity extends AppCompatActivity
         }
 
         //add course to sidebar
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-        List<String> mCourses = new ArrayList<String>();
-        mCourses.add(course.getName());
-        // Set the adapter for the list view
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.nav_bar_layout, mCourses));
-        // Set the list's click listener
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+//        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+//        List<String> mCourses = new ArrayList<String>();
+//        mCourses.add(course.getName());
+//        // Set the adapter for the list view
+//        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+//                R.layout.nav_bar_layout, mCourses));
+//        // Set the list's click listener
+//        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
     }
 
 

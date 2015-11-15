@@ -88,7 +88,7 @@ public class AssessmentDataSource extends DataSource<Assessment> {
         return assessments;
     }
     public String[] getAllColumns() {
-        return new String[] { COLUMN_ID, COLUMN_TYPE, COLUMN_MARK, COLUMN_MARKED, COLUMN_WORTH };
+        return new String[] { COLUMN_COURSE, COLUMN_ID, COLUMN_TYPE, COLUMN_MARK, COLUMN_MARKED, COLUMN_WORTH };
     }
     public Assessment generateObjectFromCursor(Cursor cursor) {
         if (cursor == null) {
