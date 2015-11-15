@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CourseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<List> {
+        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<List<Assessment>> {
 
     private ArrayAdapter mAdapter;
     // The Loader's id (this id is specific to the ListFragment's LoaderManager)
@@ -51,6 +51,7 @@ public class CourseActivity extends AppCompatActivity
     private TableLayout tableLayout;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
+    private Boolean newCourse;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,6 +109,7 @@ public class CourseActivity extends AppCompatActivity
             List<Assessment> assessments = mDataSource.read("course = ?", whereArgs, null, null, "id");
             //if assessments is empty, this is a new course
             if (assessments.size() == 0) {
+                newCourse = true;
                 final EditText type1EditText = (EditText) findViewById(R.id.type_1);
                 final EditText yourMark1EditText = (EditText) findViewById(R.id.your_mark_1);
                 final EditText worth1EditText = (EditText) findViewById(R.id.worth_1);
@@ -117,6 +119,7 @@ public class CourseActivity extends AppCompatActivity
             }
             else {
                 //now we want to iterate through all the assessments and display them in a table layout
+                newCourse = false;
                 displayAssessments(assessments);
             }
         }
@@ -127,13 +130,13 @@ public class CourseActivity extends AppCompatActivity
     }
 
     @Override
-    public Loader<List> onCreateLoader(int id, Bundle args) {
-        AbstractDataLoader<List> loader = new AssessmentLoader(getApplicationContext(), mDataSource, null, null, null, null, null);
+    public Loader<List<Assessment>> onCreateLoader(int id, Bundle args) {
+        AssessmentLoader loader = new AssessmentLoader(getApplicationContext(), mDataSource, null, null, null, null, null);
         return loader;
     }
 
     @Override
-    public void onLoadFinished(Loader<List> loader, List data) {
+    public void onLoadFinished(Loader<List<Assessment>> loader, List<Assessment> data) {
         if (DEBUG) Log.i(TAG, "+++ onLoadFinished() called! +++");
         mAdapter.clear();
         for(int i = 0; i < data.size(); i++){
@@ -141,7 +144,7 @@ public class CourseActivity extends AppCompatActivity
         }
     }
     @Override
-    public void onLoaderReset(Loader<List> arg0) {
+    public void onLoaderReset(Loader<List<Assessment>> arg0) {
         mAdapter.clear();
     }
     @Override
@@ -421,14 +424,16 @@ public class CourseActivity extends AppCompatActivity
         //create a database of this user's data so they can save it
         DBHelper mDBHelper = new DBHelper(getApplicationContext());
         db = mDBHelper.getWritableDatabase();
-        ContentValues courseValues = new ContentValues();
-        //add the course "COURSE NAME" and "DESIRED GRADE" to the course table
-        courseValues.put(DBHelper.COURSE_TABLE_NAME_COLUMN, course.getName());
-        courseValues.put(DBHelper.COURSE_TABLE_DESIRED_GRADE_COLUMN, course.getDesiredGrade());
-        db.insert(
-                DBHelper.COURSE_TABLE,
-                null,
-                courseValues);
+        CourseDataSource cds = new CourseDataSource(db);
+        cds.insert(course);
+//        ContentValues courseValues = new ContentValues();
+//        //add the course "COURSE NAME" and "DESIRED GRADE" to the course table
+//        courseValues.put(CourseDataSource.COLUMN_NAME, course.getName());
+//        courseValues.put(CourseDataSource.COLUMN_DESIRED_GRADE, course.getDesiredGrade());
+//        db.insert(
+//                Course,
+//                null,
+//                courseValues);
     }
 
     public void addAssessmentsToDB() {
@@ -436,12 +441,14 @@ public class CourseActivity extends AppCompatActivity
         for (Map.Entry<Integer, Assessment> aEntry : course.getAssessments().entrySet()) {
             ContentValues assValues = new ContentValues();
             Assessment a = aEntry.getValue();
-            assValues.put(DBHelper.ASS_TABLE_TYPE_COLUMN, a.getType());
-            assValues.put(DBHelper.ASS_TABLE_MARK_COLUMN, a.getMark());
-            assValues.put(DBHelper.ASS_TABLE_MARKED_COLUMN, a.isMarked());
-            assValues.put(DBHelper.ASS_TABLE_WORTH_COLUMN, a.getWorth());
+            assValues.put(AssessmentDataSource.COLUMN_COURSE, course.getName());
+            assValues.put(AssessmentDataSource.COLUMN_ID, aEntry.getKey());
+            assValues.put(AssessmentDataSource.COLUMN_TYPE, a.getType());
+            assValues.put(AssessmentDataSource.COLUMN_MARK, a.getMark());
+            assValues.put(AssessmentDataSource.COLUMN_MARKED, a.isMarked());
+            assValues.put(AssessmentDataSource.COLUMN_WORTH, a.getWorth());
             db.insert(
-                    DBHelper.ASS_TABLE,
+                    AssessmentDataSource.TABLE_NAME,
                     null,
                     assValues);
         }
@@ -471,8 +478,13 @@ public class CourseActivity extends AppCompatActivity
 
     public void saveCourse(String name) {
         course.setName(name);
-        addCourseToDB();
-        addAssessmentsToDB();
+        if (newCourse) {
+            addCourseToDB();
+            addAssessmentsToDB();
+        }
+        else {
+            //updateCourse
+        }
 
         //add course to sidebar
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
