@@ -43,12 +43,14 @@ public class CourseActivity extends AppCompatActivity
     private static final int LOADER_ID = 1;
     private  static final boolean DEBUG = true;
     private static final String TAG = "CustomLoaderExampleListFragment";
-    private SQLiteDatabase mDatabase;
+    private SQLiteDatabase db;
     private AssessmentDataSource mDataSource;
     private DBHelper mDbHelper;
     private Integer numRows = 0;
     private Course course;
     private TableLayout tableLayout;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,8 +77,8 @@ public class CourseActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         mDbHelper = new DBHelper(getApplicationContext());
-        mDatabase = mDbHelper.getWritableDatabase();
-        mDataSource = new AssessmentDataSource(mDatabase);
+        db = mDbHelper.getWritableDatabase();
+        mDataSource = new AssessmentDataSource(db);
 
         // Initialize a Loader with id '1'. If the Loader with this id already
         // exists, then the LoaderManager will reuse the existing Loader.
@@ -91,7 +93,7 @@ public class CourseActivity extends AppCompatActivity
         //now we want to iterate through all the assessments and display them in a table layout
 
         mDbHelper.close();
-        mDatabase.close();
+        db.close();
     }
 
     @Override
@@ -115,10 +117,10 @@ public class CourseActivity extends AppCompatActivity
     public void onDestroy() {
         super.onDestroy();
         mDbHelper.close();
-        mDatabase.close();
+        db.close();
         mDataSource = null;
         mDbHelper = null;
-        mDatabase = null;
+        db = null;
     }
 
     @Override
@@ -185,7 +187,7 @@ public class CourseActivity extends AppCompatActivity
     public void displayAssessments(List<Assessment> assessments) {
         //for assessment in list
         for(int i = 0; i < assessments.size(); i++) {
-            addRow(i);
+            addRow(i, assessments.get(i));
         }
 
     }
@@ -299,7 +301,7 @@ public class CourseActivity extends AppCompatActivity
                     //more than current rowNum, don't do anything.
                     if (numRows.equals(currentRowNum)) {
                         //else, create a new row (INFLATE activity)
-                        addRow(currentRowNum + 1);
+                        addRow(currentRowNum + 1, null);
                         numRows += 1;
                     }
                     removeExtraRow(currentRowNum, tableLayout);
@@ -331,7 +333,7 @@ public class CourseActivity extends AppCompatActivity
                     //more than current rowNum, don't do anything.
                     if (numRows.equals(currentRowNum)) {
                         //else, create a new row (INFLATE activity)
-                        addRow(currentRowNum + 1);
+                        addRow(currentRowNum + 1, null);
                         numRows += 1;
                     }
                     removeExtraRow(currentRowNum, tableLayout);
@@ -361,7 +363,7 @@ public class CourseActivity extends AppCompatActivity
                     //more than current rowNum, don't do anything.
                     if (numRows.equals(currentRowNum)) {
                         //else, create a new row (INFLATE activity)
-                        addRow(currentRowNum + 1);
+                        addRow(currentRowNum + 1, null);
                         numRows += 1;
                     }
                     removeExtraRow(currentRowNum, tableLayout);
@@ -429,7 +431,6 @@ public class CourseActivity extends AppCompatActivity
             public void onClick(DialogInterface dialog, int whichButton) {
                 String courseName = courseNameET.getText().toString();
                 saveCourse(courseName);
-                testDB();
                 return;
             }
         });

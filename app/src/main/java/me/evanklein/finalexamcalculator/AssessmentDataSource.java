@@ -12,6 +12,7 @@ import java.util.List;
 
 public class AssessmentDataSource extends DataSource<Assessment> {
     public static final String TABLE_NAME = "assessment";
+    public static final String COLUMN_COURSE = "course";
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_TYPE = "type";
     public static final String COLUMN_MARK = "mark";
@@ -19,11 +20,14 @@ public class AssessmentDataSource extends DataSource<Assessment> {
     public static final String COLUMN_WORTH = "worth";
     // Database creation sql statement
     public static final String CREATE_COMMAND = "create table " + TABLE_NAME
-            + "(" + COLUMN_ID + " integer primary key, "
-            + COLUMN_TYPE + " text not null, "
+            + "("
+            + COLUMN_COURSE + " text not null, "
+            + COLUMN_ID + " integer not null, "
+            + COLUMN_TYPE + " text, "
             + COLUMN_MARK + " float, "
             + COLUMN_MARKED + " boolean, "
-            + COLUMN_WORTH + " float);";
+            + COLUMN_WORTH + " float, "
+            + "PRIMARY KEY (" + COLUMN_COURSE + "," + COLUMN_ID + "));";
     public AssessmentDataSource(SQLiteDatabase database) {
         super(database);
     }
