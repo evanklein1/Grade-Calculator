@@ -11,11 +11,11 @@ public class FeedReaderDBHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "grade_calculator.db";
-    public static final String COURSE_TABLE = "course";
+    //public static final String COURSE_TABLE = "course";
     public static final String ASS_TABLE = "assessment";
 
-    public static final String COURSE_TABLE_NAME_COLUMN = "name";
-    public static final String COURSE_TABLE_DESIRED_GRADE_COLUMN = "desired_grade";
+    //public static final String COURSE_TABLE_NAME_COLUMN = "name";
+    //public static final String COURSE_TABLE_DESIRED_GRADE_COLUMN = "desired_grade";
     public static final String ASS_TABLE_TYPE_COLUMN = "type";
     public static final String ASS_TABLE_MARK_COLUMN = "mark";
     public static final String ASS_TABLE_MARKED_COLUMN = "marked";
@@ -25,12 +25,10 @@ public class FeedReaderDBHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     public void onCreate(SQLiteDatabase db) {
-        String drop_courses = "DROP TABLE IF EXISTS course;";
-        db.execSQL(drop_courses);
-        String courses_table = "CREATE TABLE course (name varchar(255), desired_grade float);";
+        //String courses_table = "CREATE TABLE course (name varchar(255), desired_grade float);";
         String assessment_table =
                 "CREATE TABLE " + ASS_TABLE + " (type varchar(255), mark float, marked boolean, worth float);";
-        db.execSQL(courses_table);
+        db.execSQL(CourseDataSource.CREATE_COMMAND);
         db.execSQL(assessment_table);
     }
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
