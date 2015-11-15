@@ -12,10 +12,13 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -23,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     final static String COURSE_NAME = "courseName";
-
+    private Student student;
+    private ArrayAdapter<String> mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +41,9 @@ public class MainActivity extends AppCompatActivity {
 
         //initialize a student object, which is a singleton class and represents the student using
         //the app
-        Student student = Student.getInstance();
+        student = Student.getInstance();
+        addDrawerItems();
+
     }
 
     @Override
@@ -95,5 +101,16 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(this, CourseActivity.class);
         i.putExtra(COURSE_NAME, courseName);
         startActivity(i);
+    }
+
+    public void addDrawerItems() {
+        ArrayList<Course> courses = student.getCourses();
+        String[] courseNames = new String[courses.size()];
+
+        for (int i = 0; i < courses.size(); i++) {
+            courseNames[i] = courses.get(i).getName();
+        }
+        mAdapter = new ArrayAdapter<String>(this, R.layout.drawer_list_item, courseNames);
+        mDrawerList.setAdapter(mAdapter);
     }
 }

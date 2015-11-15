@@ -55,18 +55,17 @@ public class CourseActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
 
-        mDrawerList = (ListView) findViewById(R.id.navList);
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+                this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         tableLayout = (TableLayout) findViewById(R.id.table_home);
-
 
         //set the student object
         student = Student.getInstance();
@@ -461,16 +460,15 @@ public class CourseActivity extends AppCompatActivity
 //        // Set the list's click listener
 //        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
     }
-    private void addDrawerItems() {
+
+    public void addDrawerItems() {
         ArrayList<Course> courses = student.getCourses();
         String[] courseNames = new String[courses.size()];
 
         for (int i = 0; i < courses.size(); i++) {
             courseNames[i] = courses.get(i).getName();
         }
-        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courseNames);
+        mAdapter = new ArrayAdapter<String>(this, R.layout.drawer_list_item, courseNames);
         mDrawerList.setAdapter(mAdapter);
     }
-
-
 }
