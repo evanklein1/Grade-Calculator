@@ -157,6 +157,8 @@
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
                             android:ems="2"
+                            android:imeOptions="actionDone"
+                            android:singleLine="true"
                             android:id="@+id/desired_grade" />
                     </TableRow>
                 </TableLayout>

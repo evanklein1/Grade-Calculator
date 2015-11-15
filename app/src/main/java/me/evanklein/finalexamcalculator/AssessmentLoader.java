@@ -6,6 +6,7 @@ package me.evanklein.finalexamcalculator;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.os.AsyncTask;
 
 import java.util.List;
 
@@ -119,44 +120,36 @@ public class AssessmentLoader extends AsyncTaskLoader<List<Assessment>> {
         List testList = mDataSource.read(mSelection, mSelectionArgs, mGroupBy, mHaving,	mOrderBy);
         return testList;
     }
-//    public void insert(Assessment entity) {
-//        new InsertTask(this).execute(entity);
-//    }
-//    public void update(Assessment entity) {
-//        new UpdateTask(this).execute(entity);
-//    }
-//    public void delete(Assessment entity) {
-//        new DeleteTask(this).execute(entity);
-//    }
-//    private class InsertTask extends ContentChangingTask<Assessment, Void, Void> {
-//        InsertTask(AssessmentLoader loader) {
-//            super(loader);
-//        }
-//        @Override
-//        protected Void doInBackground(Assessment... params) {
-//            mDataSource.insert(params[0]);
-//            return (null);
-//        }
-//    }
-//    private class UpdateTask extends ContentChangingTask<Assessment, Void, Void> {
-//        UpdateTask(AssessmentLoader loader) {
-//            super(loader);
-//        }
-//
-//        @Override
-//        protected Void doInBackground(Assessment... params) {
-//            mDataSource.update(params[0]);
-//            return (null);
-//        }
-//    }
-//    private class DeleteTask extends ContentChangingTask<Assessment, Void, Void> {
-//        DeleteTask(AssessmentLoader loader) {
-//            super(loader);
-//        }
-//        @Override
-//        protected Void doInBackground(Assessment... params) {
-//            mDataSource.delete(params[0]);
-//            return (null);
-//        }
-//    }
+    public void insert(Assessment entity) {
+        new InsertTask().execute(entity);
+    }
+    public void update(Assessment entity) {
+        new UpdateTask().execute(entity);
+    }
+    public void delete(Assessment entity) {
+        new DeleteTask().execute(entity);
+    }
+    private class InsertTask extends AsyncTask<Assessment, Void, Void> {
+        @Override
+        protected Void doInBackground(Assessment... params) {
+            mDataSource.insert(params[0]);
+            return (null);
+        }
+    }
+    private class UpdateTask extends AsyncTask<Assessment, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Assessment... params) {
+            mDataSource.update(params[0]);
+            return (null);
+        }
+    }
+    private class DeleteTask extends AsyncTask<Assessment, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Assessment... params) {
+            mDataSource.delete(params[0]);
+            return (null);
+        }
+    }
 }
