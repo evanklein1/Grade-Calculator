@@ -1,8 +1,10 @@
 package me.evanklein.finalexamcalculator;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,8 +15,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.List;
+
 public class CourseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<List> {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +47,12 @@ public class CourseActivity extends AppCompatActivity
 
         //when a course activity is started, we need to get the name of the course, and load all of
         //its assessments from the database
-        DbHelper helper = new DbHelper(this);
+
+        //reads courses from db
+        DBHelper helper = new DBHelper(this);
         SQLiteDatabase database = helper.getWritableDatabase();
-        TestDataSource dataSource = new TestDataSource(database);
-        List list = dataSource.read();
+        CourseDataSource dataSource = new CourseDataSource(database);
+        List courses = dataSource.read();
         if(list == null || list.size() == 0){
             dataSource.insert(new Test("Samik"));
             dataSource.insert(new Test("Piyas"));

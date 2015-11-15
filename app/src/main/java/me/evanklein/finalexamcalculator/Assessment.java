@@ -8,6 +8,15 @@ public class Assessment {
     private Double mark;
     private Double worth;
     private String type;
+    private Integer id;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public boolean isEmpty() {
         return (worth.equals(0.0)) && (type.equals("")) && (mark.equals(0.0));
