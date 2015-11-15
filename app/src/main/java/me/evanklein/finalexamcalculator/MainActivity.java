@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private Student student;
     private ArrayAdapter<String> mAdapter;
     private SQLiteDatabase db;
-    private AssessmentDataSource mDataSource;
+    private CourseDataSource mDataSource;
     private DBHelper mDbHelper;
     private static final int LOADER_ID = 1;
 
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         toggle.syncState();
         mDbHelper = new DBHelper(getApplicationContext());
         db = mDbHelper.getWritableDatabase();
-        mDataSource = new AssessmentDataSource(db);
+        mDataSource = new CourseDataSource(db);
 
         // Initialize a Loader with id '1'. If the Loader with this id already
         // exists, then the LoaderManager will reuse the existing Loader.
@@ -63,6 +63,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         //initialize a student object, which is a singleton class and represents the student using
         //the app
         student = Student.getInstance();
+        //get all the courses from the database
+        List<Course> courses = mDataSource.read();
+        student.setCourses((ArrayList) courses);
         addDrawerItems();
 
     }
@@ -74,14 +77,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Assessment>> loader, List<Assessment> data) {
+    public void onLoadFinished(Loader<List<Course>> loader, List<Course> data) {
 //        mAdapter.clear();
         for(int i = 0; i < data.size(); i++){
             //mAdapter.add(data.get(i));
         }
     }
     @Override
-    public void onLoaderReset(Loader<List<Assessment>> arg0) {
+    public void onLoaderReset(Loader<List<Course>> arg0) {
         //mAdapter.clear();
     }
     @Override
