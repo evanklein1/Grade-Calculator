@@ -125,8 +125,6 @@ public class CourseActivity extends AppCompatActivity
         }
         setDesiredGradeListener();
         setTouchListener();
-        mDbHelper.close();
-        db.close();
     }
 
     @Override
@@ -137,7 +135,6 @@ public class CourseActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<List<Assessment>> loader, List<Assessment> data) {
-        if (DEBUG) Log.i(TAG, "+++ onLoadFinished() called! +++");
         mAdapter.clear();
         for(int i = 0; i < data.size(); i++){
             mAdapter.add(data.get(i));
