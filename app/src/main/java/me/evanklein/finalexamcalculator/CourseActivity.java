@@ -1,5 +1,10 @@
 package me.evanklein.finalexamcalculator;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -18,12 +23,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class CourseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<List> {
@@ -36,7 +46,9 @@ public class CourseActivity extends AppCompatActivity
     private SQLiteDatabase mDatabase;
     private AssessmentDataSource mDataSource;
     private DBHelper mDbHelper;
+    private Integer numRows = 0;
     private Course course;
+    private TableLayout tableLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -228,4 +240,224 @@ public class CourseActivity extends AppCompatActivity
         tableRow.addView(newWorth);
         tableLayout.addView(tableRow, params);
     }
+
+    public void updateTotals() {
+        TextView mark_so_far = (TextView)findViewById(R.id.mark_so_far);
+        TextView worth_so_far = (TextView)findViewById(R.id.total_worth);
+        Double worth = course.getTotalWorth();
+        Double mark = course.getMarkSoFar();
+        worth_so_far.setText(String.format("%.0f", worth));
+        mark_so_far.setText(String.format("%.1f %%", mark));
+    }
+
+    public void removeExtraRow(Integer currentRowNum, TableLayout tableLayout) {
+        if ((course.getAssessment(currentRowNum+1) != null) && course.getAssessment(currentRowNum+1).isEmpty()) {
+            if ((course.getAssessment(currentRowNum+2) != null) && course.getAssessment(currentRowNum+2).isEmpty()) {
+                //remove currentRowNum+2
+                tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(currentRowNum + 2)));
+                course.removeAssessment(currentRowNum+2);
+                numRows -= 1;
+
+            }
+        }
+    }
+
+    public void setDesiredGradeListener() {
+        final EditText desiredGradeET = (EditText) findViewById(R.id.desired_grade);
+        desiredGradeET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                //if we just lost focus
+                if (!hasFocus) {
+                    //change the assessment object
+                    Double desiredGrade = Double.valueOf(desiredGradeET.getText().toString());
+                    course.setDesiredGrade(desiredGrade);
+                    Double requiredRestMark = course.getRequiredRestMark();
+                    //change the text of the message at the bottom
+                    TextView messageTV = (TextView) findViewById(R.id.final_message);
+                    messageTV.setText(String.format
+                            ("You need %.1f%% in the rest of the course to get %.0f%% in this course.",
+                                    requiredRestMark, desiredGrade));
+                    updateTotals();
+
+                }
+            }
+        });
+    }
+
+    public void setTypeListener(final EditText typeET, Integer rowNum) {
+        final Integer currentRowNum = rowNum;
+        typeET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                //if we just exited the type field
+                if (!hasFocus) {
+                    //change the assessment object
+                    course.addAssessment(currentRowNum).setType(typeET.getText().toString());
+                } else {
+                    //we have entered focus: if the number of existing rows in the activity is
+                    //more than current rowNum, don't do anything.
+                    if (numRows.equals(currentRowNum)) {
+                        //else, create a new row (INFLATE activity)
+                        addRow(currentRowNum + 1);
+                        numRows += 1;
+                    }
+                    removeExtraRow(currentRowNum, tableLayout);
+                }
+                updateTotals();
+            }
+        });
+    }
+
+    public void setMarkListener(final EditText markET, Integer rowNum) {
+        final Integer currentRowNum = rowNum;
+        markET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                //if we just exited the type field
+                if (!hasFocus) {
+                    Assessment currentAss = course.addAssessment(currentRowNum);
+                    //change the assessment object
+                    if (!("".equals(markET.getText().toString()))) {
+                        currentAss.setMark(Double.valueOf(markET.getText().toString()));
+                        currentAss.setMarked(true);
+                    } else {
+                        //not marked
+                        currentAss.setMarked(false);
+                        currentAss.setMark(0.0);
+                    }
+                } else {
+                    //we have entered focus: if the number of existing rows in the activity is
+                    //more than current rowNum, don't do anything.
+                    if (numRows.equals(currentRowNum)) {
+                        //else, create a new row (INFLATE activity)
+                        addRow(currentRowNum + 1);
+                        numRows += 1;
+                    }
+                    removeExtraRow(currentRowNum, tableLayout);
+                }
+                updateTotals();
+            }
+        });
+    }
+
+    public void setWorthListener(final EditText worthET, Integer rowNum) {
+        final Integer currentRowNum = rowNum;
+        worthET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                //if we just exited the type field
+                if (!hasFocus) {
+                    //change the assessment object
+                    //check if assessment is empty
+                    if (!("".equals(worthET.getText().toString()))) {
+                        course.addAssessment(currentRowNum).setWorth(Double.valueOf(worthET.getText().toString()));
+                    }
+                    else {
+                        course.getAssessment(currentRowNum).setWorth(0.0);
+                    }
+                } else {
+                    //we have entered focus: if the number of existing rows in the activity is
+                    //more than current rowNum, don't do anything.
+                    if (numRows.equals(currentRowNum)) {
+                        //else, create a new row (INFLATE activity)
+                        addRow(currentRowNum + 1);
+                        numRows += 1;
+                    }
+                    removeExtraRow(currentRowNum, tableLayout);
+                }
+                //either way, want to update the mark so far (or just make sure it's up to date
+                //and the worth so far
+                updateTotals();
+            }
+        });
+    }
+
+    public void setTouchListener() {
+        findViewById(R.id.main_layout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                InputMethodManager imm = (InputMethodManager) view.getContext()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        });
+    };
+
+    public void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public void addCourseToDB() {
+        //create a database of this user's data so they can save it
+        DBHelper mDBHelper = new DBHelper(getApplicationContext());
+        db = mDBHelper.getWritableDatabase();
+        ContentValues courseValues = new ContentValues();
+        //add the course "COURSE NAME" and "DESIRED GRADE" to the course table
+        courseValues.put(DBHelper.COURSE_TABLE_NAME_COLUMN, course.getName());
+        courseValues.put(DBHelper.COURSE_TABLE_DESIRED_GRADE_COLUMN, course.getDesiredGrade());
+        db.insert(
+                DBHelper.COURSE_TABLE,
+                null,
+                courseValues);
+    }
+
+    public void addAssessmentsToDB() {
+        //add the assessments to the ass table
+        for (Map.Entry<Integer, Assessment> aEntry : course.getAssessments().entrySet()) {
+            ContentValues assValues = new ContentValues();
+            Assessment a = aEntry.getValue();
+            assValues.put(DBHelper.ASS_TABLE_TYPE_COLUMN, a.getType());
+            assValues.put(DBHelper.ASS_TABLE_MARK_COLUMN, a.getMark());
+            assValues.put(DBHelper.ASS_TABLE_MARKED_COLUMN, a.isMarked());
+            assValues.put(DBHelper.ASS_TABLE_WORTH_COLUMN, a.getWorth());
+            db.insert(
+                    DBHelper.ASS_TABLE,
+                    null,
+                    assValues);
+        }
+    }
+
+    public void promptCourseName(View view) {
+        //ask for course name
+        AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
+        alertDB.setMessage("Enter the name of this course:");
+        final EditText courseNameET = new EditText(this);
+        alertDB.setView(courseNameET);
+        alertDB.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String courseName = courseNameET.getText().toString();
+                saveCourse(courseName);
+                testDB();
+                return;
+            }
+        });
+        alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                return;
+            }
+        });
+        AlertDialog alert = alertDB.create();
+        alert.show();
+    }
+
+    public void saveCourse(String name) {
+        course.setName(name);
+        addCourseToDB();
+        addAssessmentsToDB();
+
+        //add course to sidebar
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        List<String> mCourses = new ArrayList<String>();
+        mCourses.add(course.getName());
+        // Set the adapter for the list view
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+                R.layout.nav_bar_layout, mCourses));
+        // Set the list's click listener
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+    }
+
+
 }
