@@ -268,14 +268,10 @@ public class CourseActivity extends AppCompatActivity
     }
 
     public void removeExtraRow(Integer currentRowNum, TableLayout tableLayout) {
-        if ((course.getAssessment(currentRowNum+1) != null) && course.getAssessment(currentRowNum+1).isEmpty()) {
-            if ((course.getAssessment(currentRowNum+2) != null) && course.getAssessment(currentRowNum+2).isEmpty()) {
-                //remove currentRowNum+2
-                tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(currentRowNum + 2)));
-                course.removeAssessment(currentRowNum+2);
-                numRows -= 1;
-
-            }
+        while (course.getAssessment(numRows-1).isEmpty() && (numRows - 1 > currentRowNum)) {
+            tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(numRows)));
+            course.removeAssessment(numRows);
+            numRows -= 1;
         }
     }
 
@@ -459,7 +455,7 @@ public class CourseActivity extends AppCompatActivity
             }
         });
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
         AlertDialog alert = alertDB.create();
         alert.show();
     }
