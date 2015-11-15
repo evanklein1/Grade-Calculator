@@ -267,7 +267,7 @@ public class CourseActivity extends AppCompatActivity
         mark_so_far.setText(String.format("%.1f %%", mark));
     }
 
-    public void removeExtraRow(Integer currentRowNum, TableLayout tableLayout) {
+    public void removeExtraRows(Integer currentRowNum, TableLayout tableLayout) {
         while (course.getAssessment(numRows-1).isEmpty() && (numRows - 1 > currentRowNum)) {
             tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(numRows)));
             course.removeAssessment(numRows);
@@ -315,7 +315,7 @@ public class CourseActivity extends AppCompatActivity
                         addRow(currentRowNum + 1, null);
                         numRows += 1;
                     }
-                    removeExtraRow(currentRowNum, tableLayout);
+                    removeExtraRows(currentRowNum, tableLayout);
                 }
                 updateTotals();
             }
@@ -347,7 +347,7 @@ public class CourseActivity extends AppCompatActivity
                         addRow(currentRowNum + 1, null);
                         numRows += 1;
                     }
-                    removeExtraRow(currentRowNum, tableLayout);
+                    removeExtraRows(currentRowNum, tableLayout);
                 }
                 updateTotals();
             }
@@ -377,7 +377,7 @@ public class CourseActivity extends AppCompatActivity
                         addRow(currentRowNum + 1, null);
                         numRows += 1;
                     }
-                    removeExtraRow(currentRowNum, tableLayout);
+                    removeExtraRows(currentRowNum, tableLayout);
                 }
                 //either way, want to update the mark so far (or just make sure it's up to date
                 //and the worth so far
