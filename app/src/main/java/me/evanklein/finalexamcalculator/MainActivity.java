@@ -34,6 +34,10 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
+        //initialize a student object, which is a singleton class and represents the student using
+        //the app
+        Student student = Student.getInstance();
     }
 
     @Override

@@ -19,7 +19,9 @@ public class Student {
 
     //make the constructor private so that this class cannot be
     //instantiated
-    private Student(){}
+    private Student(){
+        courses = new ArrayList<Course>();
+    }
 
     //Get the only object available
     public static Student getInstance(){
