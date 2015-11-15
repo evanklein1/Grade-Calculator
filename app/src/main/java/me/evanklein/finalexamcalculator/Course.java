@@ -109,5 +109,6 @@ public class Course {
 
     public Course() {
         assessments = new HashMap<Integer, Assessment>();
+        name = "";
     }
 }

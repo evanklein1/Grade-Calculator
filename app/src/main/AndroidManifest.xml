@@ -23,6 +23,15 @@
             android:label="@string/title_activity_saved_courses"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity
+            android:name=".CourseActivity"
+            android:label="@string/title_activity_course"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.evanklein.finalexamcalculator.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

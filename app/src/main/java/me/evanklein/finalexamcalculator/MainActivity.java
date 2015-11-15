@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        course = new Course();
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -59,10 +60,8 @@ public class MainActivity extends AppCompatActivity {
         // Set the list's click listener
         //mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         //map the variable names to values
-        LinearLayout linearLayout = new LinearLayout(this);
         numRows = 1;
         editTextMap = new HashMap<String, EditText>();
-        course = new Course();
         editTextMap.put("type_1", (EditText) findViewById(R.id.type_1));
         editTextMap.put("your_mark_1", (EditText) findViewById(R.id.your_mark_1));
         editTextMap.put("worth_1", (EditText) findViewById(R.id.worth_1));
@@ -361,6 +360,17 @@ public class MainActivity extends AppCompatActivity {
         course.setName(name);
         addCourseToDB();
         addAssessmentsToDB();
+
+        //add course to sidebar
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        List<String> mCourses = new ArrayList<String>();
+        mCourses.add(course.getName());
+        // Set the adapter for the list view
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+                R.layout.nav_bar_layout, mCourses));
+        // Set the list's click listener
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
     }
 
     public void testDB() {
