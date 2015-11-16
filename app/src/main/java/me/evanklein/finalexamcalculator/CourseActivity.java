@@ -114,9 +114,11 @@ public class CourseActivity extends AppCompatActivity
                 displayAssessments(assessments);
             }
         }
+        final EditText desiredGradeET = (EditText) findViewById(R.id.desired_grade);
+        desiredGradeET.setText(course.getDesiredGrade().toString());
         setDesiredGradeListener();
         setTouchListener();
-
+        updateTotals();
         //set sidebar items
         addDrawerItems();
     }
@@ -193,7 +195,12 @@ public class CourseActivity extends AppCompatActivity
     public void displayAssessments(List<Assessment> assessments) {
         //if assessments is empty, this is a new course
         for(int i = 0; i < assessments.size(); i++) {
-            addRow(i, assessments.get(i));
+            if (assessments.get(i).isEmpty()) {
+                //just add a blank row
+                addRow(i, null);
+            } else {
+                addRow(i, assessments.get(i));
+            }
         }
     }
     private void disableEditText(EditText editText) {
@@ -238,9 +245,9 @@ public class CourseActivity extends AppCompatActivity
             newType.setText(a.getType());
             newYourMark.setText(a.getMark().toString());
             newWorth.setText(a.getWorth().toString());
-            disableEditText(newType);
-            disableEditText(newYourMark);
-            disableEditText(newWorth);
+//            disableEditText(newType);
+//            disableEditText(newYourMark);
+//            disableEditText(newWorth);
         }
         tableRow.addView(newType);
         tableRow.addView(newYourMark);
@@ -274,19 +281,22 @@ public class CourseActivity extends AppCompatActivity
                 //if we just lost focus
                 if (!hasFocus) {
                     //change the assessment object
-                    Double desiredGrade = Double.valueOf(desiredGradeET.getText().toString());
-                    course.setDesiredGrade(desiredGrade);
-                    Double requiredRestMark = course.getRequiredRestMark();
-                    //change the text of the message at the bottom
-                    TextView messageTV = (TextView) findViewById(R.id.final_message);
-                    messageTV.setText(String.format
-                            ("You need %.1f%% in the rest of the course to get %.0f%% in this course.",
-                                    requiredRestMark, desiredGrade));
+                    calculateRequiredMark();
                     updateTotals();
-
                 }
             }
         });
+    }
+    public void calculateRequiredMark() {
+        final EditText desiredGradeET = (EditText) findViewById(R.id.desired_grade);
+        Double desiredGrade = Double.valueOf(desiredGradeET.getText().toString());
+        course.setDesiredGrade(desiredGrade);
+        Double requiredRestMark = course.getRequiredRestMark();
+        //change the text of the message at the bottom
+        TextView messageTV = (TextView) findViewById(R.id.final_message);
+        messageTV.setText(String.format
+                ("You need %.1f%% in the rest of the course to get %.0f%% in this course.",
+                        requiredRestMark, desiredGrade));
     }
 
     public void setTypeListener(final EditText typeET, Integer rowNum) {
@@ -308,6 +318,7 @@ public class CourseActivity extends AppCompatActivity
                     }
                     removeExtraRows(currentRowNum, tableLayout);
                 }
+                calculateRequiredMark();
                 updateTotals();
             }
         });
@@ -340,6 +351,7 @@ public class CourseActivity extends AppCompatActivity
                     }
                     removeExtraRows(currentRowNum, tableLayout);
                 }
+                calculateRequiredMark();
                 updateTotals();
             }
         });
@@ -371,6 +383,7 @@ public class CourseActivity extends AppCompatActivity
                 }
                 //either way, want to update the mark so far (or just make sure it's up to date
                 //and the worth so far
+                calculateRequiredMark();
                 updateTotals();
             }
         });
