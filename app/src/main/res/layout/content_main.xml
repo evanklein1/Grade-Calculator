@@ -128,7 +128,6 @@
 
             </LinearLayout>
         </ScrollView>
-
         <ListView
             android:id="@+id/left_drawer"
             android:layout_width="200dp"

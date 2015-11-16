@@ -171,10 +171,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     public void addDrawerItems() {
-        ArrayList<Course> courses = student.getCourses();
-        String[] courseNames = new String[courses.size()];
+        //first add the home button
 
-        for (int i = 0; i < courses.size(); i++) {
+        ArrayList<Course> courses = student.getCourses();
+        String[] courseNames = new String[courses.size() + 1];
+        courseNames[0] = "Home";
+        for (int i = 1; i < courses.size(); i++) {
             courseNames[i] = courses.get(i).getName();
         }
         mAdapter = new ArrayAdapter<String>(this, R.layout.drawer_list_item, courseNames);
@@ -257,14 +259,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     /** Swaps fragments in the main content view */
     private void selectItem(int position) {
-        // Create a new fragment and specify the planet to show based on position
-        Intent i = new Intent(MainActivity.this, CourseActivity.class);
-        i.putExtra(COURSE_NAME, student.getCourses().get(position).getName());
-        startActivity(i);
-        // Highlight the selected item, update the title, and close the drawer
-        mDrawerList.setItemChecked(position, true);
-        setTitle(student.getCourses().get(position).getName());
-        mDrawerLayout.closeDrawer(mDrawerList);
+        if (position == 0) {
+            //go to main activity
+            Intent i = new Intent(MainActivity.this, MainActivity.class);
+            i.putExtra(COURSE_NAME, student.getCourses().get(position).getName());
+            startActivity(i);
+            mDrawerLayout.closeDrawers();
+        }
+        else {
+            // Create a new fragment and specify the planet to show based on position
+            Intent i = new Intent(MainActivity.this, CourseActivity.class);
+            i.putExtra(COURSE_NAME, student.getCourses().get(position).getName());
+            startActivity(i);
+            // Highlight the selected item, update the title, and close the drawer
+            mDrawerList.setItemChecked(position, true);
+            setTitle(student.getCourses().get(position).getName());
+            mDrawerLayout.closeDrawer(mDrawerList);
+        }
     }
 
     @Override
