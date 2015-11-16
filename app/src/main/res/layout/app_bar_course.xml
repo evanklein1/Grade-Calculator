@@ -7,12 +7,12 @@
     tools:context="me.evanklein.finalexamcalculator.CourseActivity">
 
     <android.support.design.widget.AppBarLayout android:layout_height="wrap_content"
-        android:layout_width="match_parent" android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_width="match_parent"
+        android:theme="@style/AppTheme.AppBarOverlay">
 
         <include layout="@layout/toolbar"/>
 
     </android.support.design.widget.AppBarLayout>
-
     <include layout="@layout/content_course" />
 
 </android.support.design.widget.CoordinatorLayout>
