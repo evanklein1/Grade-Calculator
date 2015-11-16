@@ -62,10 +62,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getLoaderManager().initLoader(LOADER_ID, null, this);
         //initialize a student object, which is a singleton class and represents the student using
         //the app
-        student = Student.getInstance();
+        //student = Student.getInstance();
         //get all the courses from the database
-        List<Course> courses = mDataSource.read();
-        student.setCourses((ArrayList) courses);
+        //List<Course> courses = mDataSource.read();
+        //student.setCourses((ArrayList) courses);
         addDrawerItems();
 
     }
@@ -157,11 +157,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     public void addDrawerItems() {
-        ArrayList<Course> courses = student.getCourses();
-        String[] courseNames = new String[courses.size()];
-
-        for (int i = 0; i < courses.size(); i++) {
-            courseNames[i] = courses.get(i).getName();
+        //ArrayList<Course> courses = student.getCourses();
+        //String[] courseNames = new String[courses.size()];
+        String[] courseNames = new String[10];
+        for (int i = 0; i < 10; i++) {
+            courseNames[i] = "test";
         }
         mAdapter = new ArrayAdapter<String>(this, R.layout.drawer_list_item, courseNames);
         mDrawerList.setAdapter(mAdapter);
