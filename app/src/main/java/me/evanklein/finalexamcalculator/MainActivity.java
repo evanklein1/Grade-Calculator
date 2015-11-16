@@ -13,22 +13,27 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Course>>{
-    Course course;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     final static String COURSE_NAME = "courseName";
@@ -38,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private CourseDataSource mDataSource;
     private DBHelper mDbHelper;
     private static final int LOADER_ID = 1;
-
+    private TableLayout tableLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
+        tableLayout = (TableLayout) findViewById(R.id.table_home);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -62,12 +68,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getLoaderManager().initLoader(LOADER_ID, null, this);
         //initialize a student object, which is a singleton class and represents the student using
         //the app
-        //student = Student.getInstance();
+        student = Student.getInstance();
         //get all the courses from the database
-        //List<Course> courses = mDataSource.read();
-        //student.setCourses((ArrayList) courses);
+        List<Course> courses = mDataSource.read();
+        student.setCourses((ArrayList) courses);
         addDrawerItems();
-
+        //if courses are empty, want to just print a string telling them to add courses
+        if (courses.size() == 0) {
+            displayNoCoursesMessage();
+        }
+        else {
+            //now we want to iterate through all the assessments and display them in a table layout
+            displayCourses();
+        }
     }
 
     @Override
@@ -157,13 +170,105 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     public void addDrawerItems() {
-        //ArrayList<Course> courses = student.getCourses();
-        //String[] courseNames = new String[courses.size()];
-        String[] courseNames = new String[10];
-        for (int i = 0; i < 10; i++) {
-            courseNames[i] = "test";
+        ArrayList<Course> courses = student.getCourses();
+        String[] courseNames = new String[courses.size()];
+
+        for (int i = 0; i < courses.size(); i++) {
+            courseNames[i] = courses.get(i).getName();
         }
         mAdapter = new ArrayAdapter<String>(this, R.layout.drawer_list_item, courseNames);
         mDrawerList.setAdapter(mAdapter);
+    }
+
+    public void displayCourses() {
+        //if assessments is empty, this is a new course
+        ArrayList<Course> courses = student.getCourses();
+        for(int i = 0; i < courses.size(); i++) {
+            addRow(i, courses.get(i));
+        }
+    }
+
+    public void displayNoCoursesMessage() {
+        TableRow tableRow = new TableRow(this);
+        TableRow.LayoutParams params = new TableRow.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT);
+        TableRow.LayoutParams newNameLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+        final TextView noCoursesTV = new TextView(this);
+        noCoursesTV.setLayoutParams(newNameLayoutParams);
+        noCoursesTV.setText("It looks like you haven't added courses yet.");
+        tableRow.addView(noCoursesTV);
+        tableLayout.addView(tableRow, params);
+    }
+    public void addRow(final Integer currentRowNum, Course c) {
+        TableRow tableRow = new TableRow(this);
+        TableRow.LayoutParams params = new TableRow.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT);
+        TableRow.LayoutParams newNameLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+        TableRow.LayoutParams newDGLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+        TableRow.LayoutParams newButtonLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+        newNameLayoutParams.column = 0;
+        newDGLayoutParams.column = 1;
+        newButtonLayoutParams.column = 2;
+        final TextView newName = new TextView(this);
+        final TextView newDG = new TextView(this);
+        final Button newButton = new Button(this);
+        String rowTag = "row_" + Integer.toString(currentRowNum);
+        tableRow.setTag(rowTag);
+        //set tag and layout params for name
+        String nameString = "name_" + Integer.toString(currentRowNum);
+        newName.setTag(nameString);
+        newName.setLayoutParams(newNameLayoutParams);
+
+        String dgString = "desired_grade_" + Integer.toString(currentRowNum);
+        newDG.setTag(dgString);
+        newDG.setLayoutParams(newDGLayoutParams);
+        String buttonString = "edit_button_" + Integer.toString(currentRowNum);
+        newButton.setTag(buttonString);
+        newButton.setLayoutParams(newButtonLayoutParams);
+        //set onclick listener for button
+        setButtonListener(newButton, c.getName());
+            //we want to fill in the values of the edit texts and then disable them
+        newName.setText(c.getName());
+        newDG.setText(c.getDesiredGrade().toString());
+        newButton.setText("View");
+        tableRow.addView(newName);
+        tableRow.addView(newDG);
+        tableRow.addView(newButton);
+        tableLayout.addView(tableRow, params);
+    }
+
+    public void setButtonListener(final Button button, final String courseName) {
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                Intent i = new Intent(MainActivity.this, CourseActivity.class);
+                i.putExtra(COURSE_NAME, courseName);
+                startActivity(i);
+                return;
+            }
+        });
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            selectItem(position);
+        }
+    }
+
+    /** Swaps fragments in the main content view */
+    private void selectItem(int position) {
+        // Create a new fragment and specify the planet to show based on position
+        Intent i = new Intent(MainActivity.this, CourseActivity.class);
+        i.putExtra(COURSE_NAME, student.getCourses().get(position).getName());
+        startActivity(i);
+        // Highlight the selected item, update the title, and close the drawer
+        mDrawerList.setItemChecked(position, true);
+        setTitle(student.getCourses().get(position).getName());
+        mDrawerLayout.closeDrawer(mDrawerList);
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        CharSequence mTitle = title;
+        getActionBar().setTitle(mTitle);
     }
 }
