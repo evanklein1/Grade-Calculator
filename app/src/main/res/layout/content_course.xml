@@ -16,7 +16,6 @@
             android:layout_height="match_parent"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="25dp"
             android:paddingBottom="@dimen/activity_vertical_margin"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:showIn="@layout/activity_main" tools:context=".MainActivity"
@@ -27,6 +26,7 @@
                 android:orientation="vertical"
                 android:clickable="true"
                 android:id="@+id/main_layout"
+                android:paddingTop="20dp"
                 android:focusableInTouchMode="true">
                 <TableLayout
                     android:layout_width="match_parent"

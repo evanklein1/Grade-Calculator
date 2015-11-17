@@ -50,6 +50,8 @@ public class CourseActivity extends AppCompatActivity
     private ListView mDrawerList;
     private ArrayAdapter<String> mAdapter;
     private Student student;
+    private EditText desiredGradeET;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +70,8 @@ public class CourseActivity extends AppCompatActivity
         //navigationView.setNavigationItemSelectedListener(this);
 
         tableLayout = (TableLayout) findViewById(R.id.table_home);
-
+        //set the desired grade edit text
+        desiredGradeET = (EditText) findViewById(R.id.desired_grade);
         //set the student object
         student = Student.getInstance();
 
@@ -83,6 +86,10 @@ public class CourseActivity extends AppCompatActivity
         //its assessments from the database
         //reads courses from db
 
+        //listen for the desired grade change here, so that when it is loaded from the database
+        //the final message will be displayed
+        setDesiredGradeListener();
+
         //get the course name which has been passed to you
         Bundle extras = getIntent().getExtras();
         String courseName;
@@ -92,6 +99,8 @@ public class CourseActivity extends AppCompatActivity
         }
         else {
             courseName = extras.getString(MainActivity.COURSE_NAME);
+            //set the activity name
+            getSupportActionBar().setTitle(courseName);
             //create a new Course to be used for this activity, set its name
             course = new Course();
             course.setName(courseName);
@@ -114,12 +123,10 @@ public class CourseActivity extends AppCompatActivity
                 newCourse = false;
                 displayAssessments(assessments);
                 //also display the desired grade
-                final EditText desiredGradeET = (EditText) findViewById(R.id.desired_grade);
                 desiredGradeET.setText(course.getDesiredGrade().toString());
                 updateTotals();
             }
         }
-        setDesiredGradeListener();
         setTouchListener();
         //set sidebar items
         addDrawerItems();
@@ -276,7 +283,6 @@ public class CourseActivity extends AppCompatActivity
     }
 
     public void setDesiredGradeListener() {
-        final EditText desiredGradeET = (EditText) findViewById(R.id.desired_grade);
         desiredGradeET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -290,15 +296,17 @@ public class CourseActivity extends AppCompatActivity
         });
     }
     public void calculateRequiredMark() {
-        final EditText desiredGradeET = (EditText) findViewById(R.id.desired_grade);
-        Double desiredGrade = Double.valueOf(desiredGradeET.getText().toString());
-        course.setDesiredGrade(desiredGrade);
-        Double requiredRestMark = course.getRequiredRestMark();
-        //change the text of the message at the bottom
-        TextView messageTV = (TextView) findViewById(R.id.final_message);
-        messageTV.setText(String.format
-                ("You need %.1f%% in the rest of the course to get %.0f%% in this course.",
-                        requiredRestMark, desiredGrade));
+        String desiredGradeSTR = desiredGradeET.getText().toString();
+        if (!("".equals(desiredGradeSTR))) {
+            Double desiredGrade = Double.valueOf(desiredGradeET.getText().toString());
+            course.setDesiredGrade(desiredGrade);
+            Double requiredRestMark = course.getRequiredRestMark();
+            //change the text of the message at the bottom
+            TextView messageTV = (TextView) findViewById(R.id.final_message);
+            messageTV.setText(String.format
+                    ("You need %.1f%% in the rest of the course to get %.0f%% in this course.",
+                            requiredRestMark, desiredGrade));
+        }
     }
 
     public void setTypeListener(final EditText typeET, Integer rowNum) {
@@ -465,10 +473,10 @@ public class CourseActivity extends AppCompatActivity
 
     public void addDrawerItems() {
         ArrayList<Course> courses = student.getCourses();
-        String[] courseNames = new String[courses.size()];
-
+        String[] courseNames = new String[courses.size() + 1];
+        courseNames[0] = "Home";
         for (int i = 0; i < courses.size(); i++) {
-            courseNames[i] = courses.get(i).getName();
+            courseNames[i+1] = courses.get(i).getName();
         }
         mAdapter = new ArrayAdapter<String>(this, R.layout.drawer_list_item, courseNames);
         mDrawerList.setAdapter(mAdapter);

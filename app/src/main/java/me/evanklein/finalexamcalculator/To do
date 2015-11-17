@@ -9,3 +9,5 @@ set all listeners to change on typing, not just focus change
 
 select items in drawer
 validate input
+    - when they enter a course name, check if that course is already in the database
+option to delete course
