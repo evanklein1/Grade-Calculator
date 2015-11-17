@@ -109,16 +109,18 @@ public class CourseActivity extends AppCompatActivity
                 numRows += 1;
             }
             else {
-                //now we want to iterate through all the assessments and display them in a table layout
+                //this is an existing course
+                //so we want to iterate through all the assessments and display them in a table layout
                 newCourse = false;
                 displayAssessments(assessments);
+                //also display the desired grade
+                final EditText desiredGradeET = (EditText) findViewById(R.id.desired_grade);
+                desiredGradeET.setText(course.getDesiredGrade().toString());
+                updateTotals();
             }
         }
-        final EditText desiredGradeET = (EditText) findViewById(R.id.desired_grade);
-        desiredGradeET.setText(course.getDesiredGrade().toString());
         setDesiredGradeListener();
         setTouchListener();
-        updateTotals();
         //set sidebar items
         addDrawerItems();
     }

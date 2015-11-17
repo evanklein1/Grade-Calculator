@@ -5,7 +5,6 @@ You need a " + x + "% in the REST of the course to get a " + desiredGrade + "% i
 --> if only the final is unmarked, then say "you need ... on the FINAL"
 set input type on mark and worth fields
 hiding keyboard
-set desired grade listener to change on any edit text field change
 set all listeners to change on typing, not just focus change
 
 select items in drawer

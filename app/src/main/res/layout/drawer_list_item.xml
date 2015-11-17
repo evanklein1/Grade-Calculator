@@ -5,6 +5,7 @@
     android:layout_weight="1"
     android:paddingTop="20dp"
     android:paddingBottom="20dp"
+    android:paddingLeft="30dp"
     android:textAppearance="?android:attr/textAppearanceMedium"
     android:text="Course Name">
 </TextView>

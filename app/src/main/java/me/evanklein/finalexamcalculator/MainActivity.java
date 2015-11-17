@@ -176,8 +176,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         ArrayList<Course> courses = student.getCourses();
         String[] courseNames = new String[courses.size() + 1];
         courseNames[0] = "Home";
-        for (int i = 1; i < courses.size(); i++) {
-            courseNames[i] = courses.get(i).getName();
+        for (int i = 0; i < courses.size(); i++) {
+            courseNames[i+1] = courses.get(i).getName();
         }
         mAdapter = new ArrayAdapter<String>(this, R.layout.drawer_list_item, courseNames);
         mDrawerList.setAdapter(mAdapter);
@@ -261,20 +261,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void selectItem(int position) {
         if (position == 0) {
             //go to main activity
-            Intent i = new Intent(MainActivity.this, MainActivity.class);
-            i.putExtra(COURSE_NAME, student.getCourses().get(position).getName());
-            startActivity(i);
+            //i.e. do nothing
             mDrawerLayout.closeDrawers();
         }
         else {
             // Create a new fragment and specify the planet to show based on position
-            Intent i = new Intent(MainActivity.this, CourseActivity.class);
-            i.putExtra(COURSE_NAME, student.getCourses().get(position).getName());
+            mDrawerList.setItemChecked(position, true);
+            Integer index = position;
+            //setTitle(student.getCourses().get(position).getName());
+            Intent i = new Intent(this, CourseActivity.class);
+            String courseName = student.getCourses().get(index).getName();
+            i.putExtra(COURSE_NAME, courseName);
+            mDrawerLayout.closeDrawer(mDrawerList);
             startActivity(i);
             // Highlight the selected item, update the title, and close the drawer
-            mDrawerList.setItemChecked(position, true);
-            setTitle(student.getCourses().get(position).getName());
-            mDrawerLayout.closeDrawer(mDrawerList);
         }
     }
 
