@@ -1,9 +1,11 @@
 package me.evanklein.finalexamcalculator;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.sqlite.SQLiteDatabase;
@@ -248,6 +250,7 @@ public class CourseActivity extends AppCompatActivity
         String typeString = "type_" + Integer.toString(currentRowNum);
         newType.setTag(typeString);
         newType.setLayoutParams(newTypeLayoutParams);
+        newType.setHint("Test, etc.");
         String yourMarkString = "your_mark_" + Integer.toString(currentRowNum);
         newYourMark.setTag(yourMarkString);
         newYourMark.setLayoutParams(newYourMarkLayoutParams);
@@ -470,10 +473,11 @@ public class CourseActivity extends AppCompatActivity
                 assessmentValues.put(AssessmentDataSource.COLUMN_WORTH, a.getWorth());
                 if (!newAssessments.containsValue(a)) {
                     //if this is not a new assessment, update it
+                    String selection = AssessmentDataSource.COLUMN_ID + " = ? AND " +
+                            AssessmentDataSource.COLUMN_COURSE + " = ?";
+                    String[] args = {aEntry.getKey().toString(), course.getName()};
                     db.update(AssessmentDataSource.TABLE_NAME,
-                            assessmentValues, AssessmentDataSource.COLUMN_ID + " = "
-                                    + aEntry.getKey() + " AND " +
-                                    AssessmentDataSource.COLUMN_COURSE + " = " + course.getName(), null);
+                            assessmentValues, selection, args);
                 } else {
                     //this is a new assignment, add it
                     ContentValues assValues = new ContentValues();
@@ -483,7 +487,7 @@ public class CourseActivity extends AppCompatActivity
                     assValues.put(AssessmentDataSource.COLUMN_MARK, a.getMark());
                     assValues.put(AssessmentDataSource.COLUMN_MARKED, a.isMarked());
                     assValues.put(AssessmentDataSource.COLUMN_WORTH, a.getWorth());
-                    db.insert(
+                    db.insertOrThrow(
                             AssessmentDataSource.TABLE_NAME,
                             null,
                             assValues);
@@ -522,7 +526,18 @@ public class CourseActivity extends AppCompatActivity
             updateCourseInDB();
         }
         manageAssessmentsInDB();
-        addDrawerItems();
+        db.close();
+        AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
+        alertDB.setMessage("Saved!");
+        alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                return;
+            }
+        });
+        AlertDialog alert = alertDB.create();
+        alert.show();
+
+            addDrawerItems();
         //add course to sidebar
 //        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 //        mDrawerList = (ListView) findViewById(R.id.left_drawer);

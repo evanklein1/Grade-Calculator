@@ -41,9 +41,10 @@ public class CourseDataSource {
         if (entity == null) {
             return false;
         }
+        String[] selectionArgs = { entity.getName() };
         int result = mDatabase.update(TABLE_NAME,
-                generateContentValuesFromObject(entity), COLUMN_NAME + " = "
-                        + entity.getName(), null);
+                generateContentValuesFromObject(entity), COLUMN_NAME + " = ?",
+                selectionArgs);
         return result != 0;
     }
     public List read() {
