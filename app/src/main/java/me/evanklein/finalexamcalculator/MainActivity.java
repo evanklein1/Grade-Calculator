@@ -230,10 +230,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         String nameString = "name_" + Integer.toString(currentRowNum);
         newName.setTag(nameString);
         newName.setLayoutParams(newNameLayoutParams);
-
-        String dgString = "desired_grade_" + Integer.toString(currentRowNum);
+        newName.setTextSize(20);
+        String dgString = "current_grade_" + Integer.toString(currentRowNum);
         newDG.setTag(dgString);
         newDG.setLayoutParams(newDGLayoutParams);
+        newDG.setTextSize(20);
         String buttonString = "edit_button_" + Integer.toString(currentRowNum);
         newButton.setTag(buttonString);
         newButton.setLayoutParams(newButtonLayoutParams);
@@ -241,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setButtonListener(newButton, c.getName());
             //we want to fill in the values of the edit texts and then disable them
         newName.setText(c.getName());
-        newDG.setText(c.getDesiredGrade().toString());
+        newDG.setText(c.getCurrentGrade().toString());
         newButton.setText("View");
         tableRow.addView(newName);
         tableRow.addView(newDG);

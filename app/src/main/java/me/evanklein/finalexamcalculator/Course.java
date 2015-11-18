@@ -11,6 +11,16 @@ public class Course {
     private String name;
     private HashMap<Integer, Assessment> assessments;
     private Double desiredGrade;
+    private Double currentGrade;
+
+    /*This is only used for reading from the database */
+    public void setCurrentGrade(Double currentGrade) {
+        this.currentGrade = currentGrade;
+    }
+
+    public Double getCurrentGrade() {
+        return currentGrade;
+    }
 
     public String getName() {
         return name;
@@ -43,7 +53,8 @@ public class Course {
             return 0.0;
         }
         else {
-            return mark / markedWorth * 100;
+            currentGrade = mark / markedWorth * 100;
+            return currentGrade;
         }
     }
 

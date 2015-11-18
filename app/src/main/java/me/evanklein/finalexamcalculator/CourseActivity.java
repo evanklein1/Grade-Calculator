@@ -452,7 +452,14 @@ public class CourseActivity extends AppCompatActivity
 
     public void updateCourseInDB() {
         //create a database of this user's data so they can save it
-        courseDS.update(course);
+
+        //just going to delete the table and then make a new one
+        String courses_table = "DROP TABLE IF EXISTS course;";
+        db.execSQL(courses_table);
+        addCourseToDB();
+
+        //courseDS.update(course);
+
 //        ContentValues courseValues = new ContentValues();
 //        //add the course "COURSE NAME" and "DESIRED GRADE" to the course table
 //        courseValues.put(CourseDataSource.COLUMN_NAME, course.getName());
@@ -519,8 +526,8 @@ public class CourseActivity extends AppCompatActivity
 //    }
 
     public void saveCourse(View view) {
-        student.addCourse(course);
         if (newCourse) {
+            student.addCourse(course);
             addCourseToDB();
         }
         else {
@@ -575,6 +582,10 @@ public class CourseActivity extends AppCompatActivity
             //go to main activity
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
+        }
+        else if (position == (student.getCourses().indexOf(course.getName())+1)) {
+            //they selected the current course, do nothing, just close drawer
+            mDrawerLayout.closeDrawers();
         }
         else {
             mDrawerList.setItemChecked(position, true);

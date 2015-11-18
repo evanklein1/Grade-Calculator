@@ -14,9 +14,11 @@ public class CourseDataSource {
     public static final String TABLE_NAME = "course";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_DESIRED_GRADE = "desired_grade";
+    public static final String COLUMN_CURRENT_GRADE = "current_grade";
     // Database creation sql statement
     public static final String CREATE_COMMAND = "create table " + TABLE_NAME
             + "(" + COLUMN_NAME + " text not null, "
+            + COLUMN_CURRENT_GRADE + " float, "
             + COLUMN_DESIRED_GRADE + " float);";
     public CourseDataSource(SQLiteDatabase database) {
         mDatabase = database;
@@ -83,6 +85,7 @@ public class CourseDataSource {
         Course course = new Course();
         course.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)));
         course.setDesiredGrade(cursor.getDouble(cursor.getColumnIndex(COLUMN_DESIRED_GRADE)));
+        course.setCurrentGrade(cursor.getDouble(cursor.getColumnIndex(COLUMN_DESIRED_GRADE)));
         return course;
     }
     public ContentValues generateContentValuesFromObject(Course entity) {
@@ -93,6 +96,7 @@ public class CourseDataSource {
         //add the course "COURSE NAME" and "DESIRED GRADE" to the course table
         courseValues.put(COLUMN_NAME, entity.getName());
         courseValues.put(COLUMN_DESIRED_GRADE, entity.getDesiredGrade());
+        courseValues.put(COLUMN_CURRENT_GRADE, entity.getMarkSoFar());
         return courseValues;
     }
 }
