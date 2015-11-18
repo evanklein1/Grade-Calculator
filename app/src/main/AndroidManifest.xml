@@ -22,6 +22,7 @@
             android:name=".CourseActivity"
             android:label="@string/title_activity_course"
             android:parentActivityName=".MainActivity"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
