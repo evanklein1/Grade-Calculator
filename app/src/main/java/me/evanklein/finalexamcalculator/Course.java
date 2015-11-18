@@ -76,12 +76,13 @@ public class Course {
     Checks if a mapping for this rowNum exists: if it does, return it.
     If not, add a mapping for it to a new blank assessment, and return that assessment.
      */
-    public Assessment addAssessment(Integer rowNum) {
+    public Assessment addAssessment(Integer rowNum, Assessment newA) {
         Assessment a = assessments.get(rowNum);
         if (a == null) {
             //create an assessment, put it in the map
-            a = new Assessment("", 0.0, false, 0.0);
-            assessments.put(rowNum, a);
+//            a = new Assessment("", 0.0, false, 0.0);
+            assessments.put(rowNum, newA);
+            return newA;
         }
         return a;
     }

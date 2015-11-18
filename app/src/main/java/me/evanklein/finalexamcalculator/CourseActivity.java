@@ -102,15 +102,14 @@ public class CourseActivity extends AppCompatActivity
             //set the activity name
             getSupportActionBar().setTitle(courseName);
             //create a new Course to be used for this activity, set its name
-            course = new Course();
-            //course.setName(courseName);
             CourseDataSource courseDS = new CourseDataSource(db);
 
             String[] whereArgs = new String[] {courseName};
             List<Course> courses = courseDS.read(String.format("%s = ?", CourseDataSource.COLUMN_NAME), whereArgs, null, null, null);
             //hopefully courses just contains one course
             course = courses.get(0);
-            List<Assessment> assessments = mDataSource.read("%s = ?".format(AssessmentDataSource.COLUMN_COURSE), whereArgs, null, null, "id");
+            String selection = String.format("%s = ?", AssessmentDataSource.COLUMN_COURSE);
+            List<Assessment> assessments = mDataSource.read(selection, whereArgs, null, null, "id");
             //if assessments is empty, this is a new course
             if (assessments.size() == 0) {
                 newCourse = true;
@@ -212,7 +211,7 @@ public class CourseActivity extends AppCompatActivity
         for(int i = 0; i < assessments.size(); i++) {
             if (assessments.get(i).isEmpty()) {
                 //just add a blank row
-                addRow(i, null);
+                addRow(i, new Assessment("", 0.0, false, 0.0));
             } else {
                 addRow(i, assessments.get(i));
             }
@@ -227,7 +226,7 @@ public class CourseActivity extends AppCompatActivity
     }
 
     public void addRow(final Integer currentRowNum, Assessment a) {
-        course.addAssessment(currentRowNum);
+        course.addAssessment(currentRowNum, a);
         TableRow tableRow = new TableRow(this);
         TableRow.LayoutParams params = new TableRow.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT);
         TableRow.LayoutParams newTypeLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
@@ -323,13 +322,13 @@ public class CourseActivity extends AppCompatActivity
                 //if we just exited the type field
                 if (!hasFocus) {
                     //change the assessment object
-                    course.addAssessment(currentRowNum).setType(typeET.getText().toString());
+                    course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0)).setType(typeET.getText().toString());
                 } else {
                     //we have entered focus: if the number of existing rows in the activity is
                     //more than current rowNum, don't do anything.
                     if (numRows.equals(currentRowNum)) {
                         //else, create a new row (INFLATE activity)
-                        addRow(currentRowNum + 1, null);
+                        addRow(currentRowNum + 1, new Assessment("", 0.0, false, 0.0));
                         numRows += 1;
                     }
                     removeExtraRows(currentRowNum, tableLayout);
@@ -347,7 +346,7 @@ public class CourseActivity extends AppCompatActivity
             public void onFocusChange(View v, boolean hasFocus) {
                 //if we just exited the type field
                 if (!hasFocus) {
-                    Assessment currentAss = course.addAssessment(currentRowNum);
+                    Assessment currentAss = course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0));
                     //change the assessment object
                     if (!("".equals(markET.getText().toString()))) {
                         currentAss.setMark(Double.valueOf(markET.getText().toString()));
@@ -362,7 +361,7 @@ public class CourseActivity extends AppCompatActivity
                     //more than current rowNum, don't do anything.
                     if (numRows.equals(currentRowNum)) {
                         //else, create a new row (INFLATE activity)
-                        addRow(currentRowNum + 1, null);
+                        addRow(currentRowNum + 1, new Assessment("", 0.0, false, 0.0));
                         numRows += 1;
                     }
                     removeExtraRows(currentRowNum, tableLayout);
@@ -383,7 +382,7 @@ public class CourseActivity extends AppCompatActivity
                     //change the assessment object
                     //check if assessment is empty
                     if (!("".equals(worthET.getText().toString()))) {
-                        course.addAssessment(currentRowNum).setWorth(Double.valueOf(worthET.getText().toString()));
+                        course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0)).setWorth(Double.valueOf(worthET.getText().toString()));
                     } else {
                         course.getAssessment(currentRowNum).setWorth(0.0);
                     }
@@ -392,7 +391,7 @@ public class CourseActivity extends AppCompatActivity
                     //more than current rowNum, don't do anything.
                     if (numRows.equals(currentRowNum)) {
                         //else, create a new row (INFLATE activity)
-                        addRow(currentRowNum + 1, null);
+                        addRow(currentRowNum + 1, new Assessment("", 0.0, false, 0.0));
                         numRows += 1;
                     }
                     removeExtraRows(currentRowNum, tableLayout);
