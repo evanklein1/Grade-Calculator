@@ -570,26 +570,27 @@ public class CourseActivity extends AppCompatActivity
         }
     }
 
-    /** Swaps fragments in the main content view */
     private void selectItem(int position) {
         if (position == 0) {
             //go to main activity
             Intent i = new Intent(this, MainActivity.class);
-            i.putExtra(MainActivity.COURSE_NAME, student.getCourses().get(position).getName());
             startActivity(i);
         }
         else {
+            mDrawerList.setItemChecked(position, true);
+            Integer index = position;
             // Create a new fragment and specify the planet to show based on position
             Intent i = new Intent(this, CourseActivity.class);
-            i.putExtra(MainActivity.COURSE_NAME, student.getCourses().get(position).getName());
+            String courseName = student.getCourses().get(index-1).getName();
+            Bundle extras = new Bundle();
+            extras.putString(MainActivity.COURSE_NAME, courseName);
+            extras.putString(MainActivity.NEW_COURSE, MainActivity.FALSE);
+            i.putExtras(extras);
+            mDrawerLayout.closeDrawer(mDrawerList);
+//            i.putExtra(MainActivity.COURSE_NAME, student.getCourses().get(position).getName());
             startActivity(i);
             // Highlight the selected item, update the title, and close the drawer
-            mDrawerList.setItemChecked(position, true);
-            setTitle(student.getCourses().get(position).getName());
-            mDrawerLayout.closeDrawer(mDrawerList);
         }
-        mDrawerLayout.closeDrawers();
-
     }
 
     @Override

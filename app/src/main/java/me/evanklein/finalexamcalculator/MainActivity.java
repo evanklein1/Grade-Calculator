@@ -284,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             Integer index = position;
             //setTitle(student.getCourses().get(position).getName());
             Intent i = new Intent(this, CourseActivity.class);
-            String courseName = student.getCourses().get(index).getName();
+            String courseName = student.getCourses().get(index-1).getName();
             Bundle extras = new Bundle();
             extras.putString(COURSE_NAME, courseName);
             extras.putString(NEW_COURSE, FALSE);
