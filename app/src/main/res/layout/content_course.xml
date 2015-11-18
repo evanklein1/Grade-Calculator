@@ -77,10 +77,11 @@
                             android:layout_width="fill_parent"
                             android:minWidth="60dp"
                             android:maxWidth="60dp"
+                            android:layout_marginRight="20dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:id="@+id/type_1"
-                            android:hint="Test 1, etc."
+                            android:hint="Test, etc."
                             android:layout_column="0" />
 
                         <EditText
@@ -94,14 +95,6 @@
                             android:id="@+id/your_mark_1"
                             android:layout_column="1" />
 
-
-                        TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceMedium"
-                            android:text="%"
-                            android:id="@+id/textView"
-                            android:layout_column="2" />
                         <EditText
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
