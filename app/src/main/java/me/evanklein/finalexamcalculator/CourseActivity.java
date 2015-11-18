@@ -107,9 +107,11 @@ public class CourseActivity extends AppCompatActivity
             courseName = extras.getString(MainActivity.COURSE_NAME);
             getSupportActionBar().setTitle(courseName);
 
-            if (extras.getString(MainActivity.NEW_COURSE) == MainActivity.TRUE) {
+            if (extras.getString(MainActivity.NEW_COURSE).equals(MainActivity.TRUE)) {
                 //NEW COURSE
                 newCourse = true;
+                course = new Course();
+                course.setName(courseName);
                 final EditText type1EditText = (EditText) findViewById(R.id.type_1);
                 final EditText yourMark1EditText = (EditText) findViewById(R.id.your_mark_1);
                 final EditText worth1EditText = (EditText) findViewById(R.id.worth_1);
