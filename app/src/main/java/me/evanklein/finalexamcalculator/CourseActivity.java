@@ -103,8 +103,13 @@ public class CourseActivity extends AppCompatActivity
             getSupportActionBar().setTitle(courseName);
             //create a new Course to be used for this activity, set its name
             course = new Course();
-            course.setName(courseName);
+            //course.setName(courseName);
+            CourseDataSource courseDS = new CourseDataSource(db);
+
             String[] whereArgs = new String[] {courseName};
+            List<Course> courses = courseDS.read("course = ?", whereArgs, null, null, null);
+            //hopefully courses just contains one course
+            course = courses.get(0);
             List<Assessment> assessments = mDataSource.read("course = ?", whereArgs, null, null, "id");
             //if assessments is empty, this is a new course
             if (assessments.size() == 0) {
@@ -122,7 +127,8 @@ public class CourseActivity extends AppCompatActivity
                 //so we want to iterate through all the assessments and display them in a table layout
                 newCourse = false;
                 displayAssessments(assessments);
-                //also display the desired grade
+                // display the desired grade
+                //get the desired grade from the database
                 desiredGradeET.setText(course.getDesiredGrade().toString());
                 updateTotals();
             }
