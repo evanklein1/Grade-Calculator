@@ -28,6 +28,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +129,7 @@ public class CourseActivity extends AppCompatActivity
                 displayAssessments(assessments);
                 // display the desired grade
                 //get the desired grade from the database
-                desiredGradeET.setText(course.getDesiredGrade().toString());
+                desiredGradeET.setText(formatDecimal(course.getDesiredGrade()));
                 updateTotals();
             }
         }
@@ -254,11 +255,13 @@ public class CourseActivity extends AppCompatActivity
         setTypeListener(newType, currentRowNum);
         setMarkListener(newYourMark, currentRowNum);
         setWorthListener(newWorth, currentRowNum);
-        if (a != null) {
+        if (!a.isEmpty()) {
             //we want to fill in the values of the edit texts and then disable them
             newType.setText(a.getType());
-            newYourMark.setText(a.getMark().toString());
-            newWorth.setText(a.getWorth().toString());
+            if (a.isMarked()) {
+                newYourMark.setText(formatDecimal(a.getMark()));
+            }
+            newWorth.setText(formatDecimal(a.getWorth()));
 //            disableEditText(newType);
 //            disableEditText(newYourMark);
 //            disableEditText(newWorth);
@@ -274,8 +277,9 @@ public class CourseActivity extends AppCompatActivity
         TextView worth_so_far = (TextView)findViewById(R.id.total_worth);
         Double worth = course.getTotalWorth();
         Double mark = course.getMarkSoFar();
-        worth_so_far.setText(String.format("%.0f", worth));
+        worth_so_far.setText(String.format("%s %%", formatDecimal(worth)));
         mark_so_far.setText(String.format("%.1f %%", mark));
+        calculateRequiredMark();
     }
 
     public void removeExtraRows(Integer currentRowNum, TableLayout tableLayout) {
@@ -294,7 +298,6 @@ public class CourseActivity extends AppCompatActivity
                 //if we just lost focus
                 if (!hasFocus) {
                     //change the assessment object
-                    calculateRequiredMark();
                     updateTotals();
                 }
             }
@@ -309,8 +312,8 @@ public class CourseActivity extends AppCompatActivity
             //change the text of the message at the bottom
             TextView messageTV = (TextView) findViewById(R.id.final_message);
             messageTV.setText(String.format
-                    ("You need %.1f%% in the rest of the course to get %.0f%% in this course.",
-                            requiredRestMark, desiredGrade));
+                    ("You need %.1f%% in the rest of the course to get %s%% in this course.",
+                            requiredRestMark, formatDecimal(desiredGrade)));
         }
     }
 
@@ -520,5 +523,12 @@ public class CourseActivity extends AppCompatActivity
     public void setTitle(CharSequence title) {
         CharSequence mTitle = title;
         getActionBar().setTitle(mTitle);
+    }
+
+    public String formatDecimal(Double d) {
+        String s = d.toString();
+        DecimalFormat decimalFormat = new DecimalFormat("0.#####");
+        String result = decimalFormat.format(Double.valueOf(s));
+        return result;
     }
 }
