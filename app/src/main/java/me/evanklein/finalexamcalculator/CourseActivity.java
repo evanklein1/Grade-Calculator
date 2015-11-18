@@ -107,10 +107,10 @@ public class CourseActivity extends AppCompatActivity
             CourseDataSource courseDS = new CourseDataSource(db);
 
             String[] whereArgs = new String[] {courseName};
-            List<Course> courses = courseDS.read("course = ?", whereArgs, null, null, null);
+            List<Course> courses = courseDS.read(String.format("%s = ?", CourseDataSource.COLUMN_NAME), whereArgs, null, null, null);
             //hopefully courses just contains one course
             course = courses.get(0);
-            List<Assessment> assessments = mDataSource.read("course = ?", whereArgs, null, null, "id");
+            List<Assessment> assessments = mDataSource.read("%s = ?".format(AssessmentDataSource.COLUMN_COURSE), whereArgs, null, null, "id");
             //if assessments is empty, this is a new course
             if (assessments.size() == 0) {
                 newCourse = true;
