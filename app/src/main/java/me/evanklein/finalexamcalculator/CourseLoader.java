@@ -7,7 +7,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 public class CourseLoader extends AsyncTaskLoader<List<Course>> {
-    private DataSource mDataSource;
+    private CourseDataSource mDataSource;
     private String mSelection;
     private String[] mSelectionArgs;
     private String mGroupBy;
@@ -16,7 +16,7 @@ public class CourseLoader extends AsyncTaskLoader<List<Course>> {
 
     private List<Course> mLastDataList = null;
 
-    public CourseLoader(Context context, DataSource dataSource, String selection, String[] selectionArgs, String groupBy, String having, String orderBy) {
+    public CourseLoader(Context context, CourseDataSource dataSource, String selection, String[] selectionArgs, String groupBy, String having, String orderBy) {
         super(context);
         mDataSource = dataSource;
         mSelection = selection;

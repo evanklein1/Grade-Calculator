@@ -9,7 +9,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-public class CourseDataSource extends DataSource<Course> {
+public class CourseDataSource {
+    protected SQLiteDatabase mDatabase;
     public static final String TABLE_NAME = "course";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_DESIRED_GRADE = "desired_grade";
@@ -18,9 +19,8 @@ public class CourseDataSource extends DataSource<Course> {
             + "(" + COLUMN_NAME + " text not null, "
             + COLUMN_DESIRED_GRADE + " float);";
     public CourseDataSource(SQLiteDatabase database) {
-        super(database);
+        mDatabase = database;
     }
-    @Override
     public boolean insert(Course entity) {
         if (entity == null) {
             return false;
@@ -29,7 +29,6 @@ public class CourseDataSource extends DataSource<Course> {
                 generateContentValuesFromObject(entity));
         return result != -1;
     }
-    @Override
     public boolean delete(Course entity) {
         if (entity == null) {
             return false;
@@ -38,7 +37,6 @@ public class CourseDataSource extends DataSource<Course> {
                 COLUMN_NAME + " = " + entity.getName(), null);
         return result != 0;
     }
-    @Override
     public boolean update(Course entity) {
         if (entity == null) {
             return false;
@@ -48,7 +46,6 @@ public class CourseDataSource extends DataSource<Course> {
                         + entity.getName(), null);
         return result != 0;
     }
-    @Override
     public List read() {
         Cursor cursor = mDatabase.query(TABLE_NAME, getAllColumns(), null,
                 null, null, null, null);
@@ -62,7 +59,6 @@ public class CourseDataSource extends DataSource<Course> {
         }
         return courses;
     }
-    @Override
     public List read(String selection, String[] selectionArgs,
                      String groupBy, String having, String orderBy) {
         Cursor cursor = mDatabase.query(TABLE_NAME, getAllColumns(), selection, selectionArgs, groupBy, having, orderBy);

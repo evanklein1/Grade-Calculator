@@ -30,6 +30,7 @@ import android.widget.TextView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +42,8 @@ public class CourseActivity extends AppCompatActivity
     private  static final boolean DEBUG = true;
     private static final String TAG = "CustomLoaderExampleListFragment";
     private SQLiteDatabase db;
-    private AssessmentDataSource mDataSource;
+    private AssessmentDataSource assessmentDS;
+    private CourseDataSource courseDS;
     private DBHelper mDbHelper;
     private Integer numRows = 0;
     private Course course;
@@ -52,7 +54,7 @@ public class CourseActivity extends AppCompatActivity
     private ArrayAdapter<String> mAdapter;
     private Student student;
     private EditText desiredGradeET;
-
+    private HashMap<Integer, Assessment> newAssessments;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +80,8 @@ public class CourseActivity extends AppCompatActivity
 
         mDbHelper = new DBHelper(getApplicationContext());
         db = mDbHelper.getWritableDatabase();
-        mDataSource = new AssessmentDataSource(db);
+        assessmentDS = new AssessmentDataSource(db);
+        courseDS = new CourseDataSource(db);
 
         // Initialize a Loader with id '1'. If the Loader with this id already
         // exists, then the LoaderManager will reuse the existing Loader.
@@ -102,15 +105,12 @@ public class CourseActivity extends AppCompatActivity
             courseName = extras.getString(MainActivity.COURSE_NAME);
             //set the activity name
             getSupportActionBar().setTitle(courseName);
-            //create a new Course to be used for this activity, set its name
-            CourseDataSource courseDS = new CourseDataSource(db);
-
             String[] whereArgs = new String[] {courseName};
             List<Course> courses = courseDS.read(String.format("%s = ?", CourseDataSource.COLUMN_NAME), whereArgs, null, null, null);
             //hopefully courses just contains one course
             course = courses.get(0);
             String selection = String.format("%s = ?", AssessmentDataSource.COLUMN_COURSE);
-            List<Assessment> assessments = mDataSource.read(selection, whereArgs, null, null, "id");
+            List<Assessment> assessments = assessmentDS.read(selection, whereArgs, null, null, "id");
             //if assessments is empty, this is a new course
             if (assessments.size() == 0) {
                 newCourse = true;
@@ -140,7 +140,7 @@ public class CourseActivity extends AppCompatActivity
 
     @Override
     public Loader<List<Assessment>> onCreateLoader(int id, Bundle args) {
-        AssessmentLoader loader = new AssessmentLoader(getApplicationContext(), mDataSource, null, null, null, null, null);
+        AssessmentLoader loader = new AssessmentLoader(getApplicationContext(), assessmentDS, null, null, null, null, null);
         return loader;
     }
 
@@ -160,7 +160,7 @@ public class CourseActivity extends AppCompatActivity
         super.onDestroy();
         mDbHelper.close();
         db.close();
-        mDataSource = null;
+        assessmentDS = null;
         mDbHelper = null;
         db = null;
     }
@@ -266,10 +266,15 @@ public class CourseActivity extends AppCompatActivity
 //            disableEditText(newYourMark);
 //            disableEditText(newWorth);
         }
+        else {
+            //if we're adding an empty assessment, it is a new assessment
+            newAssessments.put(currentRowNum, a);
+        }
         tableRow.addView(newType);
         tableRow.addView(newYourMark);
         tableRow.addView(newWorth);
         tableLayout.addView(tableRow, params);
+        numRows += 1;
     }
 
     public void updateTotals() {
@@ -332,7 +337,6 @@ public class CourseActivity extends AppCompatActivity
                     if (numRows.equals(currentRowNum)) {
                         //else, create a new row (INFLATE activity)
                         addRow(currentRowNum + 1, new Assessment("", 0.0, false, 0.0));
-                        numRows += 1;
                     }
                     removeExtraRows(currentRowNum, tableLayout);
                 }
@@ -365,7 +369,6 @@ public class CourseActivity extends AppCompatActivity
                     if (numRows.equals(currentRowNum)) {
                         //else, create a new row (INFLATE activity)
                         addRow(currentRowNum + 1, new Assessment("", 0.0, false, 0.0));
-                        numRows += 1;
                     }
                     removeExtraRows(currentRowNum, tableLayout);
                 }
@@ -395,7 +398,6 @@ public class CourseActivity extends AppCompatActivity
                     if (numRows.equals(currentRowNum)) {
                         //else, create a new row (INFLATE activity)
                         addRow(currentRowNum + 1, new Assessment("", 0.0, false, 0.0));
-                        numRows += 1;
                     }
                     removeExtraRows(currentRowNum, tableLayout);
                 }
@@ -425,10 +427,10 @@ public class CourseActivity extends AppCompatActivity
 
     public void addCourseToDB() {
         //create a database of this user's data so they can save it
-        DBHelper mDBHelper = new DBHelper(getApplicationContext());
-        db = mDBHelper.getWritableDatabase();
-        CourseDataSource cds = new CourseDataSource(db);
-        cds.insert(course);
+//        DBHelper mDBHelper = new DBHelper(getApplicationContext());
+//        db = mDBHelper.getWritableDatabase();
+//        CourseDataSource cds = new CourseDataSource(db);
+        courseDS.insert(course);
 //        ContentValues courseValues = new ContentValues();
 //        //add the course "COURSE NAME" and "DESIRED GRADE" to the course table
 //        courseValues.put(CourseDataSource.COLUMN_NAME, course.getName());
@@ -439,33 +441,83 @@ public class CourseActivity extends AppCompatActivity
 //                courseValues);
     }
 
-    public void addAssessmentsToDB() {
-        //add the assessments to the ass table
+    public void updateCourseInDB() {
+        //create a database of this user's data so they can save it
+        courseDS.update(course);
+//        ContentValues courseValues = new ContentValues();
+//        //add the course "COURSE NAME" and "DESIRED GRADE" to the course table
+//        courseValues.put(CourseDataSource.COLUMN_NAME, course.getName());
+//        courseValues.put(CourseDataSource.COLUMN_DESIRED_GRADE, course.getDesiredGrade());
+//        db.insert(
+//                Course,
+//                null,
+//                courseValues);
+    }
+
+    public void manageAssessmentsInDB() {
         for (Map.Entry<Integer, Assessment> aEntry : course.getAssessments().entrySet()) {
-            ContentValues assValues = new ContentValues();
+
             Assessment a = aEntry.getValue();
-            assValues.put(AssessmentDataSource.COLUMN_COURSE, course.getName());
-            assValues.put(AssessmentDataSource.COLUMN_ID, aEntry.getKey());
-            assValues.put(AssessmentDataSource.COLUMN_TYPE, a.getType());
-            assValues.put(AssessmentDataSource.COLUMN_MARK, a.getMark());
-            assValues.put(AssessmentDataSource.COLUMN_MARKED, a.isMarked());
-            assValues.put(AssessmentDataSource.COLUMN_WORTH, a.getWorth());
-            db.insert(
-                    AssessmentDataSource.TABLE_NAME,
-                    null,
-                    assValues);
+            if (!aEntry.getValue().isEmpty()) {
+                ContentValues assessmentValues = new ContentValues();
+                assessmentValues.put(AssessmentDataSource.COLUMN_TYPE, a.getType());
+                assessmentValues.put(AssessmentDataSource.COLUMN_MARK, a.getMark());
+                assessmentValues.put(AssessmentDataSource.COLUMN_MARKED, a.isMarked());
+                assessmentValues.put(AssessmentDataSource.COLUMN_WORTH, a.getWorth());
+                if (!newAssessments.containsValue(a)) {
+                    //if this is not a new assessment, update it
+                    db.update(AssessmentDataSource.TABLE_NAME,
+                            assessmentValues, AssessmentDataSource.COLUMN_ID + " = "
+                                    + aEntry.getKey() + " AND " +
+                                    AssessmentDataSource.COLUMN_COURSE + " = " + course.getName(), null);
+                } else {
+                    //this is a new assignment, add it
+                    ContentValues assValues = new ContentValues();
+                    assValues.put(AssessmentDataSource.COLUMN_COURSE, course.getName());
+                    assValues.put(AssessmentDataSource.COLUMN_ID, aEntry.getKey());
+                    assValues.put(AssessmentDataSource.COLUMN_TYPE, a.getType());
+                    assValues.put(AssessmentDataSource.COLUMN_MARK, a.getMark());
+                    assValues.put(AssessmentDataSource.COLUMN_MARKED, a.isMarked());
+                    assValues.put(AssessmentDataSource.COLUMN_WORTH, a.getWorth());
+                    db.insert(
+                            AssessmentDataSource.TABLE_NAME,
+                            null,
+                            assValues);
+                }
+            }
         }
     }
+//    public void addAssessmentsToDB(HashMap<Integer, Assessment> assessments) {
+//        //add the assessments to the ass table
+//        for (Map.Entry<Integer, Assessment> aEntry : assessments.entrySet()) {
+//            //we don't want to add empty assessments to the DB
+//            if (!aEntry.getValue().isEmpty()) {
+//                ContentValues assValues = new ContentValues();
+//                Assessment a = aEntry.getValue();
+//                assValues.put(AssessmentDataSource.COLUMN_COURSE, course.getName());
+//                assValues.put(AssessmentDataSource.COLUMN_ID, aEntry.getKey());
+//                assValues.put(AssessmentDataSource.COLUMN_TYPE, a.getType());
+//                assValues.put(AssessmentDataSource.COLUMN_MARK, a.getMark());
+//                assValues.put(AssessmentDataSource.COLUMN_MARKED, a.isMarked());
+//                assValues.put(AssessmentDataSource.COLUMN_WORTH, a.getWorth());
+//                db.insert(
+//                        AssessmentDataSource.TABLE_NAME,
+//                        null,
+//                        assValues);
+//            }
+//        }
+//    }
 
     public void saveCourse(View view) {
         student.addCourse(course);
         if (newCourse) {
             addCourseToDB();
-            addAssessmentsToDB();
         }
         else {
-            //updateCourse
+            //update the course
+            updateCourseInDB();
         }
+        manageAssessmentsInDB();
         addDrawerItems();
         //add course to sidebar
 //        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);

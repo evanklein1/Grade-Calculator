@@ -10,7 +10,8 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AssessmentDataSource extends DataSource<Assessment> {
+public class AssessmentDataSource {
+    protected SQLiteDatabase mDatabase;
     public static final String TABLE_NAME = "assessment";
     public static final String COLUMN_COURSE = "course";
     public static final String COLUMN_ID = "id";
@@ -29,9 +30,9 @@ public class AssessmentDataSource extends DataSource<Assessment> {
             + COLUMN_WORTH + " float, "
             + "PRIMARY KEY (" + COLUMN_COURSE + "," + COLUMN_ID + "));";
     public AssessmentDataSource(SQLiteDatabase database) {
-        super(database);
+        mDatabase = database;
     }
-    @Override
+
     public boolean insert(Assessment entity) {
         if (entity == null) {
             return false;
@@ -40,7 +41,6 @@ public class AssessmentDataSource extends DataSource<Assessment> {
                 generateContentValuesFromObject(entity));
         return result != -1;
     }
-    @Override
     public boolean delete(Assessment entity) {
         if (entity == null) {
             return false;
@@ -49,7 +49,6 @@ public class AssessmentDataSource extends DataSource<Assessment> {
                 COLUMN_ID + " = " + entity.getId(), null);
         return result != 0;
     }
-    @Override
     public boolean update(Assessment entity) {
         if (entity == null) {
             return false;
@@ -59,7 +58,6 @@ public class AssessmentDataSource extends DataSource<Assessment> {
                         + entity.getId(), null);
         return result != 0;
     }
-    @Override
     public List read() {
         Cursor cursor = mDatabase.query(TABLE_NAME, getAllColumns(), null,
                 null, null, null, null);
@@ -73,7 +71,6 @@ public class AssessmentDataSource extends DataSource<Assessment> {
         }
         return assessments;
     }
-    @Override
     public List read(String selection, String[] selectionArgs,
                      String groupBy, String having, String orderBy) {
         Cursor cursor = mDatabase.query(TABLE_NAME, getAllColumns(), selection, selectionArgs, groupBy, having, orderBy);
@@ -110,7 +107,6 @@ public class AssessmentDataSource extends DataSource<Assessment> {
         }
         ContentValues assessmentValues = new ContentValues();
         //add the assessment "COURSE NAME" and "DESIRED GRADE" to the course table
-        assessmentValues.put(COLUMN_ID, entity.getId());
         assessmentValues.put(COLUMN_TYPE, entity.getType());
         assessmentValues.put(COLUMN_MARK, entity.getMark());
         assessmentValues.put(COLUMN_MARKED, entity.isMarked());

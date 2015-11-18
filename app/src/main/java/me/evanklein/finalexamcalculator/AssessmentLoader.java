@@ -11,7 +11,7 @@ import android.os.AsyncTask;
 import java.util.List;
 
 public class AssessmentLoader extends AsyncTaskLoader<List<Assessment>> {
-    private DataSource mDataSource;
+    private AssessmentDataSource mDataSource;
     private String mSelection;
     private String[] mSelectionArgs;
     private String mGroupBy;
@@ -106,7 +106,7 @@ public class AssessmentLoader extends AsyncTaskLoader<List<Assessment>> {
             }
         }
     }
-    public AssessmentLoader(Context context, DataSource dataSource, String selection, String[] selectionArgs, String groupBy, String having, String orderBy) {
+    public AssessmentLoader(Context context, AssessmentDataSource dataSource, String selection, String[] selectionArgs, String groupBy, String having, String orderBy) {
         super(context);
         mDataSource = dataSource;
         mSelection = selection;
