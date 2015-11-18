@@ -163,12 +163,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 return;
             }
         });
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        showSoftKeyboard(courseNameET);
+//        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
         AlertDialog alert = alertDB.create();
         alert.show();
     }
 
+    public void showSoftKeyboard(View view) {
+        if (view.requestFocus()) {
+            InputMethodManager imm = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+        }
+    }
     public void editCourse(View view) {
         TableRow tableRow = (TableRow) view.getParent();
         TextView courseNameTV = (TextView) tableRow.getChildAt(0);
@@ -242,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setButtonListener(newButton, c.getName());
             //we want to fill in the values of the edit texts and then disable them
         newName.setText(c.getName());
-        newDG.setText(c.getCurrentGrade().toString());
+        //newDG.setText(c.getCurrentGrade().toString());
         newButton.setText("View");
         tableRow.addView(newName);
         tableRow.addView(newDG);

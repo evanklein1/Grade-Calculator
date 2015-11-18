@@ -39,9 +39,10 @@
                         android:layout_height="fill_parent">
 
                         <TextView
-                            android:layout_width="0dip"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="2"
+                            android:layout_weight="1"
+
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:text="@string/type_string"
                             android:id="@+id/type_text" />
@@ -73,28 +74,44 @@
                         >
 
                         <EditText
-                            android:layout_width="wrap_content"
+                            android:layout_width="fill_parent"
+                            android:minWidth="60dp"
+                            android:maxWidth="60dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:id="@+id/type_1"
-                            android:hint="Midterm, etc."
+                            android:hint="Test 1, etc."
                             android:layout_column="0" />
 
                         <EditText
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:minWidth="10dp"
+                            android:maxWidth="10dp"
                             android:inputType="numberDecimal"
                             android:layout_weight="1"
+                            android:hint="%"
                             android:id="@+id/your_mark_1"
                             android:layout_column="1" />
 
-                        <EditText
+
+                        TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:text="%"
+                            android:id="@+id/textView"
+                            android:layout_column="2" />
+                        <EditText
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minWidth="10dp"
+                            android:maxWidth="10dp"
                             android:inputType="numberDecimal"
                             android:layout_weight="1"
                             android:id="@+id/worth_1"
-                            android:layout_column="2" />
+                            android:layout_column="3" />
+
                     </TableRow>
                 </TableLayout>
                 <TableLayout
@@ -109,7 +126,7 @@
 
                         <TextView
                             android:layout_height="wrap_content"
-                            android:layout_width="0dip"
+                            android:layout_width="0dp"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:layout_gravity="center"
                             android:layout_weight="1"
