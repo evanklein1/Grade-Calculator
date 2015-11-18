@@ -54,7 +54,7 @@ public class CourseActivity extends AppCompatActivity
     private ArrayAdapter<String> mAdapter;
     private Student student;
     private EditText desiredGradeET;
-    private HashMap<Integer, Assessment> newAssessments;
+    private HashMap<Integer, Assessment> newAssessments =  new HashMap<Integer, Assessment>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,16 +103,10 @@ public class CourseActivity extends AppCompatActivity
         }
         else {
             courseName = extras.getString(MainActivity.COURSE_NAME);
-            //set the activity name
             getSupportActionBar().setTitle(courseName);
-            String[] whereArgs = new String[] {courseName};
-            List<Course> courses = courseDS.read(String.format("%s = ?", CourseDataSource.COLUMN_NAME), whereArgs, null, null, null);
-            //hopefully courses just contains one course
-            course = courses.get(0);
-            String selection = String.format("%s = ?", AssessmentDataSource.COLUMN_COURSE);
-            List<Assessment> assessments = assessmentDS.read(selection, whereArgs, null, null, "id");
-            //if assessments is empty, this is a new course
-            if (assessments.size() == 0) {
+
+            if (extras.getString(MainActivity.NEW_COURSE) == MainActivity.TRUE) {
+                //NEW COURSE
                 newCourse = true;
                 final EditText type1EditText = (EditText) findViewById(R.id.type_1);
                 final EditText yourMark1EditText = (EditText) findViewById(R.id.your_mark_1);
@@ -123,6 +117,16 @@ public class CourseActivity extends AppCompatActivity
                 numRows += 1;
             }
             else {
+                //EXISTING COURSE
+                //remove the first default row
+                tableLayout.removeView(tableLayout.findViewById(R.id.table_row_1));
+                String[] whereArgs = new String[]{courseName};
+                List<Course> courses = courseDS.read(String.format("%s = ?", CourseDataSource.COLUMN_NAME), whereArgs, null, null, null);
+                //hopefully courses just contains one course
+                course = courses.get(0);
+                String selection = String.format("%s = ?", AssessmentDataSource.COLUMN_COURSE);
+                List<Assessment> assessments = assessmentDS.read(selection, whereArgs, null, null, "id");
+                //if assessments is empty, this is a new course
                 //this is an existing course
                 //so we want to iterate through all the assessments and display them in a table layout
                 newCourse = false;
@@ -247,11 +251,11 @@ public class CourseActivity extends AppCompatActivity
         String yourMarkString = "your_mark_" + Integer.toString(currentRowNum);
         newYourMark.setTag(yourMarkString);
         newYourMark.setLayoutParams(newYourMarkLayoutParams);
-        newYourMark.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        newYourMark.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         String worthString = "worth_" + Integer.toString(currentRowNum);
         newWorth.setTag(worthString);
         newWorth.setLayoutParams(newWorthLayoutParams);
-        newWorth.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        newWorth.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         setTypeListener(newType, currentRowNum);
         setMarkListener(newYourMark, currentRowNum);
         setWorthListener(newWorth, currentRowNum);

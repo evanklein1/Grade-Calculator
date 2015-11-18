@@ -36,7 +36,11 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Course>>{
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
+    //constants
     final static String COURSE_NAME = "courseName";
+    final static String NEW_COURSE = "newCourse";
+    final static String TRUE = "True";
+    final static String FALSE = "False";
     private Student student;
     private ArrayAdapter<String> mAdapter;
     private SQLiteDatabase db;
@@ -145,7 +149,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onClick(DialogInterface dialog, int whichButton) {
                 String courseName = courseNameET.getText().toString();
                 Intent i = new Intent(MainActivity.this, CourseActivity.class);
-                i.putExtra(COURSE_NAME, courseName);
+                //THIS IS A NEW COURSE
+                Bundle extras = new Bundle();
+                extras.putString(COURSE_NAME, courseName);
+                extras.putString(NEW_COURSE, TRUE);
+                i.putExtras(extras);
                 startActivity(i);
                 return;
             }
@@ -166,7 +174,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         TextView courseNameTV = (TextView) tableRow.getChildAt(0);
         String courseName = courseNameTV.toString();
         Intent i = new Intent(this, CourseActivity.class);
-        i.putExtra(COURSE_NAME, courseName);
+        Bundle extras = new Bundle();
+        extras.putString(COURSE_NAME, courseName);
+        extras.putString(NEW_COURSE, FALSE);
+        i.putExtras(extras);
         startActivity(i);
     }
 
@@ -243,7 +254,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onClick(View v) {
                 // Perform action on click
                 Intent i = new Intent(MainActivity.this, CourseActivity.class);
-                i.putExtra(COURSE_NAME, courseName);
+                Bundle extras = new Bundle();
+                extras.putString(COURSE_NAME, courseName);
+                extras.putString(NEW_COURSE, FALSE);
+                i.putExtras(extras);
                 startActivity(i);
                 return;
             }
@@ -271,7 +285,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             //setTitle(student.getCourses().get(position).getName());
             Intent i = new Intent(this, CourseActivity.class);
             String courseName = student.getCourses().get(index).getName();
-            i.putExtra(COURSE_NAME, courseName);
+            Bundle extras = new Bundle();
+            extras.putString(COURSE_NAME, courseName);
+            extras.putString(NEW_COURSE, FALSE);
+            i.putExtras(extras);
             mDrawerLayout.closeDrawer(mDrawerList);
             startActivity(i);
             // Highlight the selected item, update the title, and close the drawer

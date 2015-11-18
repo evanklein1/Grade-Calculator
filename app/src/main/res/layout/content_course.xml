@@ -68,7 +68,9 @@
 
                     <TableRow
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:id="@+id/table_row_1"
+                        >
 
                         <EditText
                             android:layout_width="wrap_content"
