@@ -520,6 +520,31 @@ public class CourseActivity extends AppCompatActivity
                 updateTotals();
             }
         });
+        worthET.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+                //if there is no mapping for this key
+                Assessment currentA = course.getAssessment(currentRowNum);
+                if (currentA == null) {
+                    //add a new assessment
+                    currentA = course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0));
+                }
+                //change the assessment object
+                if (!("".equals(worthET.getText().toString()))) {
+                    currentA.setWorth(Double.valueOf(worthET.getText().toString()));
+                } else {
+                    currentA.setWorth(0.0);
+                }
+                calculateRequiredMark();
+                updateTotals();
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
+
     }
 
     public void setTouchListener() {
