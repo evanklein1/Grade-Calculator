@@ -562,10 +562,9 @@ public class CourseActivity extends AppCompatActivity
 
     public void manageAssessmentsInDB() {
         //delete all assessments from the database
-        SQLiteStatement stmt = db.compileStatement("DELETE FROM ? WHERE ? = ?");
-        stmt.bindString(1, AssessmentDataSource.TABLE_NAME);
-        stmt.bindString(2, AssessmentDataSource.COLUMN_COURSE);
-        stmt.bindString(3, course.getName());
+        SQLiteStatement stmt = db.compileStatement("DELETE FROM " + AssessmentDataSource.TABLE_NAME
+                + " WHERE " + AssessmentDataSource.COLUMN_COURSE + " = ?");
+        stmt.bindString(1, course.getName());
         stmt.execute();
         Integer id = 1;
         for (Map.Entry<Integer, Assessment> aEntry : course.getAssessments().entrySet()) {
