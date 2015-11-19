@@ -361,7 +361,7 @@ public class CourseActivity extends AppCompatActivity
                 //delete assessment
                 course.removeAssessment(currentRowNum);
                 //delete row
-                tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(numRows)));
+                tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(currentRowNum)));
                 //if we removed all the rows, need to add a first one in
                 if (course.getAssessments().size() == 0) {
                     addRow(numRows + 1, new Assessment("", 0.0, false, 0.0));
