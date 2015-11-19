@@ -103,7 +103,16 @@
                             android:inputType="numberDecimal"
                             android:layout_weight="1"
                             android:id="@+id/worth_1"
-                            android:layout_column="3" />
+                            android:layout_column="2" />
+
+                        <Button
+                            style="?android:attr/buttonStyleSmall"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:text="X"
+                            android:background="@drawable/delete_button"
+                            android:id="@+id/button"
+                            android:layout_column="4" />
 
                     </TableRow>
                 </TableLayout>

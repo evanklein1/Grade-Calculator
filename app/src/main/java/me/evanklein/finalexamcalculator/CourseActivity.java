@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -26,6 +27,7 @@ import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TableLayout;
@@ -244,12 +246,15 @@ public class CourseActivity extends AppCompatActivity
         TableRow.LayoutParams newTypeLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
         TableRow.LayoutParams newYourMarkLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
         TableRow.LayoutParams newWorthLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+        TableRow.LayoutParams newDeleteBtnLayoutParams = new TableRow.LayoutParams(30, 30, 1);
         newTypeLayoutParams.column = 0;
         newYourMarkLayoutParams.column = 1;
         newWorthLayoutParams.column = 2;
+        newDeleteBtnLayoutParams.column = 3;
         final EditText newType = new EditText(this);
         final EditText newYourMark = new EditText(this);
         final EditText newWorth = new EditText(this);
+        final Button newDelBtn = new Button(this);
         String rowTag = "row_" + Integer.toString(currentRowNum);
         tableRow.setTag(rowTag);
         String typeString = "type_" + Integer.toString(currentRowNum);
@@ -264,6 +269,11 @@ public class CourseActivity extends AppCompatActivity
         newWorth.setTag(worthString);
         newWorth.setLayoutParams(newWorthLayoutParams);
         newWorth.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        String buttonString = "del_button_" + Integer.toString(currentRowNum);
+        newDelBtn.setTag(buttonString);
+        newDelBtn.setLayoutParams(newDeleteBtnLayoutParams);
+        newDelBtn.setText("X");
+        setButtonListener(newDelBtn, currentRowNum);
         setTypeListener(newType, currentRowNum);
         setMarkListener(newYourMark, currentRowNum);
         setWorthListener(newWorth, currentRowNum);
@@ -300,6 +310,7 @@ public class CourseActivity extends AppCompatActivity
     }
 
     public void removeExtraRows(Integer currentRowNum, TableLayout tableLayout) {
+        //remove all empty rows > max(currentRowNum + 1, non-empty row)
         while (course.getAssessment(numRows-1) != null && course.getAssessment(numRows-1).isEmpty()
                 && (numRows - 1 > currentRowNum)) {
             tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(numRows)));
@@ -308,6 +319,46 @@ public class CourseActivity extends AppCompatActivity
         }
     }
 
+    public void setButtonListener(final Button button, final Integer currentRowNum) {
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                //ask if they're sure
+
+                areYouSure(course.getAssessment(currentRowNum).getType(), currentRowNum);
+
+                //delete assessment and row
+
+//                Intent i = new Intent(MainActivity.this, CourseActivity.class);
+//                Bundle extras = new Bundle();
+//                extras.putString(COURSE_NAME, courseName);
+//                extras.putString(NEW_COURSE, FALSE);
+//                i.putExtras(extras);
+//                startActivity(i);
+//                return;
+            }
+        });
+    }
+
+    public void areYouSure(String assessmentName, final Integer currentRowNum) {
+        AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
+        alertDB.setMessage("Are you sure you want to delete \"" + assessmentName + "\"?");
+        alertDB.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                //delete assessment
+                //delete row
+                course.removeAssessment(currentRowNum);
+                return;
+            }
+        });
+        alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                return;
+            }
+        });
+        AlertDialog alert = alertDB.create();
+        alert.show();
+    }
     public void setDesiredGradeListener() {
         desiredGradeET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -502,36 +553,31 @@ public class CourseActivity extends AppCompatActivity
     }
 
     public void manageAssessmentsInDB() {
+        //delete all assessments from the database
+        SQLiteStatement stmt = db.compileStatement("DELETE FROM ? WHERE ? = ?");
+        stmt.bindString(1, AssessmentDataSource.TABLE_NAME);
+        stmt.bindString(2, AssessmentDataSource.COLUMN_COURSE);
+        stmt.bindString(3, course.getName());
+        stmt.execute();
+        Integer id = 1;
         for (Map.Entry<Integer, Assessment> aEntry : course.getAssessments().entrySet()) {
-
+            //put all nonempty assessments in, with id incremented only when we've put one in
             Assessment a = aEntry.getValue();
-            if (!aEntry.getValue().isEmpty()) {
-                ContentValues assessmentValues = new ContentValues();
-                assessmentValues.put(AssessmentDataSource.COLUMN_TYPE, a.getType());
-                assessmentValues.put(AssessmentDataSource.COLUMN_MARK, a.getMark());
-                assessmentValues.put(AssessmentDataSource.COLUMN_MARKED, a.isMarked());
-                assessmentValues.put(AssessmentDataSource.COLUMN_WORTH, a.getWorth());
-                if (!newAssessments.containsValue(a)) {
-                    //if this is not a new assessment, update it
-                    String selection = AssessmentDataSource.COLUMN_ID + " = ? AND " +
-                            AssessmentDataSource.COLUMN_COURSE + " = ?";
-                    String[] args = {aEntry.getKey().toString(), course.getName()};
-                    db.update(AssessmentDataSource.TABLE_NAME,
-                            assessmentValues, selection, args);
-                } else {
-                    //this is a new assignment, add it
-                    ContentValues assValues = new ContentValues();
-                    assValues.put(AssessmentDataSource.COLUMN_COURSE, course.getName());
-                    assValues.put(AssessmentDataSource.COLUMN_ID, aEntry.getKey());
-                    assValues.put(AssessmentDataSource.COLUMN_TYPE, a.getType());
-                    assValues.put(AssessmentDataSource.COLUMN_MARK, a.getMark());
-                    assValues.put(AssessmentDataSource.COLUMN_MARKED, a.isMarked());
-                    assValues.put(AssessmentDataSource.COLUMN_WORTH, a.getWorth());
-                    db.insertOrThrow(
-                            AssessmentDataSource.TABLE_NAME,
-                            null,
-                            assValues);
-                }
+            if (!a.isEmpty()) {
+                //this is a new assignment, add it
+                ContentValues assValues = new ContentValues();
+                assValues.put(AssessmentDataSource.COLUMN_COURSE, course.getName());
+                assValues.put(AssessmentDataSource.COLUMN_ID, id);
+                assValues.put(AssessmentDataSource.COLUMN_TYPE, a.getType());
+                assValues.put(AssessmentDataSource.COLUMN_MARK, a.getMark());
+                assValues.put(AssessmentDataSource.COLUMN_MARKED, a.isMarked());
+                assValues.put(AssessmentDataSource.COLUMN_WORTH, a.getWorth());
+                db.insertOrThrow(
+                        AssessmentDataSource.TABLE_NAME,
+                        null,
+                        assValues);
+                id++;
+
             }
         }
     }
