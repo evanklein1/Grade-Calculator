@@ -277,6 +277,7 @@ public class CourseActivity extends AppCompatActivity
         String buttonString = "del_button_" + Integer.toString(currentRowNum);
         newDelBtn.setTag(buttonString);
         newDelBtn.setLayoutParams(newDeleteBtnLayoutParams);
+        newDelBtn.setBackgroundResource(R.drawable.delete_button);
         newDelBtn.setText("X");
         setButtonListener(newDelBtn, currentRowNum);
         setTypeListener(newType, currentRowNum);
