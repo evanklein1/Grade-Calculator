@@ -353,8 +353,9 @@ public class CourseActivity extends AppCompatActivity
         alertDB.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 //delete assessment
-                //delete row
                 course.removeAssessment(currentRowNum);
+                //delete row
+                tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(numRows)));
                 return;
             }
         });
