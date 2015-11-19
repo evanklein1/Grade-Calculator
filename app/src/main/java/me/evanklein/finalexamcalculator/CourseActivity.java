@@ -225,12 +225,18 @@ public class CourseActivity extends AppCompatActivity
 
     public void displayAssessments(List<Assessment> assessments) {
         //if assessments is empty, this is a new course
-        for(int i = 0; i < assessments.size(); i++) {
-            if (assessments.get(i).isEmpty()) {
-                //just add a blank row
-                addRow(i+1, new Assessment("", 0.0, false, 0.0));
-            } else {
-                addRow(i+1, assessments.get(i));
+        if (assessments.size() == 0) {
+            //add a new blank row at the top
+            addRow(numRows + 1, new Assessment("", 0.0, false, 0.0));
+        }
+        else {
+            for (int i = 0; i < assessments.size(); i++) {
+                if (assessments.get(i).isEmpty()) {
+                    //just add a blank row
+                    addRow(i + 1, new Assessment("", 0.0, false, 0.0));
+                } else {
+                    addRow(i + 1, assessments.get(i));
+                }
             }
         }
     }
@@ -356,7 +362,11 @@ public class CourseActivity extends AppCompatActivity
                 course.removeAssessment(currentRowNum);
                 //delete row
                 tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(numRows)));
-                return;
+                //if we removed all the rows, need to add a first one in
+                if (course.getAssessments().size() == 0) {
+                    addRow(numRows + 1, new Assessment("", 0.0, false, 0.0));
+                    return;
+                }
             }
         });
         alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -560,12 +570,7 @@ public class CourseActivity extends AppCompatActivity
 //                courseValues);
     }
 
-    public void manageAssessmentsInDB() {
-        //delete all assessments from the database
-        SQLiteStatement stmt = db.compileStatement("DELETE FROM " + AssessmentDataSource.TABLE_NAME
-                + " WHERE " + AssessmentDataSource.COLUMN_COURSE + " = ?");
-        stmt.bindString(1, course.getName());
-        stmt.execute();
+    public void addAssessmentsToDB() {
         Integer id = 1;
         for (Map.Entry<Integer, Assessment> aEntry : course.getAssessments().entrySet()) {
             //put all nonempty assessments in, with id incremented only when we've put one in
@@ -588,26 +593,14 @@ public class CourseActivity extends AppCompatActivity
             }
         }
     }
-//    public void addAssessmentsToDB(HashMap<Integer, Assessment> assessments) {
-//        //add the assessments to the ass table
-//        for (Map.Entry<Integer, Assessment> aEntry : assessments.entrySet()) {
-//            //we don't want to add empty assessments to the DB
-//            if (!aEntry.getValue().isEmpty()) {
-//                ContentValues assValues = new ContentValues();
-//                Assessment a = aEntry.getValue();
-//                assValues.put(AssessmentDataSource.COLUMN_COURSE, course.getName());
-//                assValues.put(AssessmentDataSource.COLUMN_ID, aEntry.getKey());
-//                assValues.put(AssessmentDataSource.COLUMN_TYPE, a.getType());
-//                assValues.put(AssessmentDataSource.COLUMN_MARK, a.getMark());
-//                assValues.put(AssessmentDataSource.COLUMN_MARKED, a.isMarked());
-//                assValues.put(AssessmentDataSource.COLUMN_WORTH, a.getWorth());
-//                db.insert(
-//                        AssessmentDataSource.TABLE_NAME,
-//                        null,
-//                        assValues);
-//            }
-//        }
-//    }
+
+    public void deleteAllAssessmentsInDB() {
+        //delete all assessments from the database
+        SQLiteStatement stmt = db.compileStatement("DELETE FROM " + AssessmentDataSource.TABLE_NAME
+                + " WHERE " + AssessmentDataSource.COLUMN_COURSE + " = ?");
+        stmt.bindString(1, course.getName());
+        stmt.execute();
+    }
 
     public void saveCourse(View view) {
         if (newCourse) {
@@ -618,7 +611,8 @@ public class CourseActivity extends AppCompatActivity
             //update the course
             updateCourseInDB();
         }
-        manageAssessmentsInDB();
+        deleteAllAssessmentsInDB();
+        addAssessmentsToDB();
         db.close();
         AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
         alertDB.setMessage("Saved!");
