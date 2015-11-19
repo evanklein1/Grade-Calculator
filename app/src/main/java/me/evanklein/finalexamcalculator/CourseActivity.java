@@ -11,7 +11,9 @@ import android.content.Loader;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -118,6 +120,7 @@ public class CourseActivity extends AppCompatActivity
                 setTypeListener(type1EditText, 1);
                 setMarkListener(yourMark1EditText, 1);
                 setWorthListener(worth1EditText, 1);
+                newAssessments.put(1, new Assessment("", 0.0, false, 0.0));
                 numRows += 1;
             }
             else {
@@ -360,18 +363,23 @@ public class CourseActivity extends AppCompatActivity
         markET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
+                //when we leave focus
+
+                //when we enter focus
+
+                //when we change text
                 //if we just exited the type field
                 if (!hasFocus) {
-                    Assessment currentAss = course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0));
-                    //change the assessment object
-                    if (!("".equals(markET.getText().toString()))) {
-                        currentAss.setMark(Double.valueOf(markET.getText().toString()));
-                        currentAss.setMarked(true);
-                    } else {
-                        //not marked
-                        currentAss.setMarked(false);
-                        currentAss.setMark(0.0);
-                    }
+//                    Assessment currentAss = course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0));
+//                    //change the assessment object
+//                    if (!("".equals(markET.getText().toString()))) {
+//                        currentAss.setMark(Double.valueOf(markET.getText().toString()));
+//                        currentAss.setMarked(true);
+//                    } else {
+//                        //not marked
+//                        currentAss.setMarked(false);
+//                        currentAss.setMark(0.0);
+//                    }
                 } else {
                     //we have entered focus: if the number of existing rows in the activity is
                     //more than current rowNum, don't do anything.
@@ -385,6 +393,33 @@ public class CourseActivity extends AppCompatActivity
                 updateTotals();
             }
         });
+        markET.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+                //if there is no mapping for this key
+                Assessment currentA = course.getAssessment(currentRowNum);
+                if (currentA == null) {
+                    //add a new assessment
+                    currentA = course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0));
+                }
+                //change the assessment object
+                if (!("".equals(markET.getText().toString()))) {
+                    currentA.setMark(Double.valueOf(markET.getText().toString()));
+                    currentA.setMarked(true);
+                } else {
+                    //not marked
+                    currentA.setMarked(false);
+                    currentA.setMark(0.0);
+                }
+                calculateRequiredMark();
+                updateTotals();
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
     }
 
     public void setWorthListener(final EditText worthET, Integer rowNum) {
@@ -396,11 +431,11 @@ public class CourseActivity extends AppCompatActivity
                 if (!hasFocus) {
                     //change the assessment object
                     //check if assessment is empty
-                    if (!("".equals(worthET.getText().toString()))) {
-                        course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0)).setWorth(Double.valueOf(worthET.getText().toString()));
-                    } else {
-                        course.getAssessment(currentRowNum).setWorth(0.0);
-                    }
+//                    if (!("".equals(worthET.getText().toString()))) {
+//                        course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0)).setWorth(Double.valueOf(worthET.getText().toString()));
+//                    } else {
+//                        course.getAssessment(currentRowNum).setWorth(0.0);
+//                    }
                 } else {
                     //we have entered focus: if the number of existing rows in the activity is
                     //more than current rowNum, don't do anything.

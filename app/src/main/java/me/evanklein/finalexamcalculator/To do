@@ -6,7 +6,6 @@ You need a " + x + "% in the REST of the course to get a " + desiredGrade + "% i
 hiding keyboard
 set all listeners to change on typing, not just focus change
 
-select items in drawer
 update items in db
 delete an assessment
 delete a course
