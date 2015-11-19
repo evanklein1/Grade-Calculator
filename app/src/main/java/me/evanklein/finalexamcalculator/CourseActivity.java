@@ -259,7 +259,7 @@ public class CourseActivity extends AppCompatActivity
         final EditText newType = new EditText(this);
         final EditText newYourMark = new EditText(this);
         final EditText newWorth = new EditText(this);
-        final Button newDelBtn = new Button(this);
+        final Button newDelBtn = new Button(this, null, android.R.attr.buttonStyleSmall);
         String rowTag = "row_" + Integer.toString(currentRowNum);
         tableRow.setTag(rowTag);
         String typeString = "type_" + Integer.toString(currentRowNum);
