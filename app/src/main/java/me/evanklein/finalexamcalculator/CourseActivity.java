@@ -119,9 +119,11 @@ public class CourseActivity extends AppCompatActivity
                 final EditText type1EditText = (EditText) findViewById(R.id.type_1);
                 final EditText yourMark1EditText = (EditText) findViewById(R.id.your_mark_1);
                 final EditText worth1EditText = (EditText) findViewById(R.id.worth_1);
+                final Button delBtn1 = (Button) findViewById(R.id.del_btn_1);
                 setTypeListener(type1EditText, 1);
                 setMarkListener(yourMark1EditText, 1);
                 setWorthListener(worth1EditText, 1);
+                setButtonListener(delBtn1, 1);
                 newAssessments.put(1, new Assessment("", 0.0, false, 0.0));
                 numRows += 1;
             }
@@ -295,6 +297,7 @@ public class CourseActivity extends AppCompatActivity
         tableRow.addView(newType);
         tableRow.addView(newYourMark);
         tableRow.addView(newWorth);
+        tableRow.addView(newDelBtn);
         tableLayout.addView(tableRow, params);
         numRows += 1;
     }

@@ -111,7 +111,7 @@
                             android:layout_height="30dp"
                             android:text="X"
                             android:background="@drawable/delete_button"
-                            android:id="@+id/button"
+                            android:id="@+id/del_btn_1"
                             android:layout_column="4" />
 
                     </TableRow>
