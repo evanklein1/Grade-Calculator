@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.DigitsKeyListener;
 import android.util.TypedValue;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -257,9 +258,7 @@ public class CourseActivity extends AppCompatActivity
         TableRow.LayoutParams newTypeLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
         TableRow.LayoutParams newYourMarkLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
         TableRow.LayoutParams newWorthLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
-        int sizeInDP = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, getResources().getDisplayMetrics());
-
-        TableRow.LayoutParams newDeleteBtnLayoutParams = new TableRow.LayoutParams(sizeInDP, sizeInDP);
+        TableRow.LayoutParams newDeleteBtnLayoutParams = new TableRow.LayoutParams(getSizeInDP(30), getSizeInDP(30));
         newTypeLayoutParams.column = 0;
         newYourMarkLayoutParams.column = 1;
         newWorthLayoutParams.column = 2;
@@ -274,14 +273,21 @@ public class CourseActivity extends AppCompatActivity
         newType.setTag(typeString);
         newType.setLayoutParams(newTypeLayoutParams);
         newType.setHint("Test, etc.");
+        newType.setMinWidth(getSizeInDP(60));
+        newType.setMaxWidth(getSizeInDP(60));
         String yourMarkString = "your_mark_" + Integer.toString(currentRowNum);
         newYourMark.setTag(yourMarkString);
         newYourMark.setLayoutParams(newYourMarkLayoutParams);
-        newYourMark.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        newYourMark.setInputType(InputType.TYPE_CLASS_NUMBER);
+        newYourMark.setKeyListener(DigitsKeyListener.getInstance("0123456789./"));
+        newYourMark.setMinWidth(getSizeInDP(10));
+        newYourMark.setMaxWidth(getSizeInDP(10));
         String worthString = "worth_" + Integer.toString(currentRowNum);
         newWorth.setTag(worthString);
         newWorth.setLayoutParams(newWorthLayoutParams);
         newWorth.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        newWorth.setMinWidth(getSizeInDP(10));
+        newWorth.setMaxWidth(getSizeInDP(10));
         String buttonString = "del_button_" + Integer.toString(currentRowNum);
         newDelBtn.setTag(buttonString);
         newDelBtn.setLayoutParams(newDeleteBtnLayoutParams);
@@ -312,6 +318,10 @@ public class CourseActivity extends AppCompatActivity
         tableRow.addView(newDelBtn);
         tableLayout.addView(tableRow, params);
         numRows += 1;
+    }
+
+    public int getSizeInDP(Integer size) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, size, getResources().getDisplayMetrics());
     }
 
     public void updateTotals() {

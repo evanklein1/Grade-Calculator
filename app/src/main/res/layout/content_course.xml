@@ -53,7 +53,7 @@
                             android:layout_gravity="center"
                             android:layout_weight="1"
                             android:textAppearance="?android:attr/textAppearanceMedium"
-                            android:text="@string/your_mark_string"
+                            android:text="Your Mark"
                             android:id="@+id/your_mark_text"
                             android:layout_column="1" />
 
@@ -91,7 +91,7 @@
                             android:maxWidth="10dp"
                             android:inputType="numberDecimal"
                             android:layout_weight="1"
-                            android:hint="%"
+                            android:digits="0123456789./"
                             android:id="@+id/your_mark_1"
                             android:layout_column="1" />
 
