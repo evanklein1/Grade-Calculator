@@ -62,6 +62,8 @@ public class CourseActivity extends AppCompatActivity
     private Student student;
     private EditText desiredGradeET;
     private HashMap<Integer, Assessment> newAssessments =  new HashMap<Integer, Assessment>();
+    private HashMap<Integer, String> fractionMarks = new HashMap<Integer, String>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -432,13 +434,15 @@ public class CourseActivity extends AppCompatActivity
         markET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                //when we leave focus
-
-                //when we enter focus
-
-                //when we change text
                 //if we just exited the type field
                 if (!hasFocus) {
+                    if (v.toString().contains("/")) {
+                        //we lost focus, so we want to display this as a percentage, but save the fraction
+                        fractionMarks.put(currentRowNum, v.toString());
+                        Assessment currentA = course.getAssessment(currentRowNum);
+                        //we know currentA is not null because the markET is not empty (it contains "/")
+                        markET.setText(formatDecimal(currentA.getMark()));
+                    }
 //                    Assessment currentAss = course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0));
 //                    //change the assessment object
 //                    if (!("".equals(markET.getText().toString()))) {
@@ -450,7 +454,13 @@ public class CourseActivity extends AppCompatActivity
 //                        currentAss.setMark(0.0);
 //                    }
                 } else {
-                    //we have entered focus: if the number of existing rows in the activity is
+                    //we have entered focus:
+                    // display the mark as a fraction (if necessary)
+                    String fraction = fractionMarks.get(currentRowNum);
+                    if (fraction != null) {
+                        markET.setText(fraction);
+                    }
+                    // if the number of existing rows in the activity is
                     //more than current rowNum, don't do anything.
                     if (numRows.equals(currentRowNum)) {
                         //else, create a new row (INFLATE activity)
@@ -470,17 +480,38 @@ public class CourseActivity extends AppCompatActivity
                     //add a new assessment
                     currentA = course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0));
                 }
-                //change the assessment object
-                if (!("".equals(markET.getText().toString()))) {
-                    currentA.setMark(Double.valueOf(markET.getText().toString()));
-                    currentA.setMarked(true);
+                //we want to check if they wrote a fraction or a percentage
+                Double result = 0.0;
+                String markSTR = s.toString();
+                if (markSTR.contains("/")) {
+                    String fraction[] = markSTR.split("/");
+                    if (fraction.length != 2) {
+                        markET.setError("Not a valid fraction!");
+                    } else {
+                        try {
+                            Double numerator = Double.parseDouble(fraction[0]);
+                            Double denominator = Double.parseDouble(fraction[1]);
+                            result = numerator / denominator * 100;
+                            currentA.setMark(result);
+                            currentA.setMarked(true);
+                        } catch (Exception e) {
+                            markET.setError("Not a valid fraction!");
+                        }
+                    }
                 } else {
-                    //not marked
-                    currentA.setMarked(false);
-                    currentA.setMark(0.0);
+
+                    //change the assessment object
+                    if (!("".equals(markET.getText().toString()))) {
+                        currentA.setMark(Double.valueOf(s.toString()));
+                        currentA.setMarked(true);
+                    } else {
+                        //not marked
+                        currentA.setMarked(false);
+                        currentA.setMark(0.0);
+                    }
+                    //calculateRequiredMark();
+                    updateTotals();
                 }
-                //calculateRequiredMark();
-                updateTotals();
             }
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -715,7 +746,7 @@ public class CourseActivity extends AppCompatActivity
 
     public String formatDecimal(Double d) {
         String s = d.toString();
-        DecimalFormat decimalFormat = new DecimalFormat("0.#####");
+        DecimalFormat decimalFormat = new DecimalFormat("0.##");
         String result = decimalFormat.format(Double.valueOf(s));
         return result;
     }
