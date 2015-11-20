@@ -643,7 +643,6 @@ public class CourseActivity extends AppCompatActivity
     }
 
     public void addAssessmentsToDB() {
-        dropAndRecreateTable();
         Integer id = 1;
         for (Map.Entry<Integer, Assessment> aEntry : course.getAssessments().entrySet()) {
             //put all nonempty assessments in, with id incremented only when we've put one in
