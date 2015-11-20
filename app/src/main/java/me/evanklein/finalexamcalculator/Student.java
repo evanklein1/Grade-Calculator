@@ -1,5 +1,6 @@
 package me.evanklein.finalexamcalculator;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -14,6 +15,14 @@ public class Student {
         return courses;
     }
 
+    public boolean containsCourseName(String name) {
+        for (Course c: courses) {
+            if (name.equals(c.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
     //create an object of SingleObject
     private static Student instance = new Student();
 

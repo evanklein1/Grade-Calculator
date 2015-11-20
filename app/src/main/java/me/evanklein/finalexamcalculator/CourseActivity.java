@@ -378,14 +378,14 @@ public class CourseActivity extends AppCompatActivity
         alert.show();
     }
     public void setDesiredGradeListener() {
-        desiredGradeET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                //if we just lost focus
-                if (!hasFocus) {
-                    //change the assessment object
-                    updateTotals();
-                }
+        desiredGradeET.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+                updateTotals();
+            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
     }
@@ -479,7 +479,7 @@ public class CourseActivity extends AppCompatActivity
                     currentA.setMarked(false);
                     currentA.setMark(0.0);
                 }
-                calculateRequiredMark();
+                //calculateRequiredMark();
                 updateTotals();
             }
 
@@ -534,7 +534,7 @@ public class CourseActivity extends AppCompatActivity
                 } else {
                     currentA.setWorth(0.0);
                 }
-                calculateRequiredMark();
+                //calculateRequiredMark();
                 updateTotals();
             }
 

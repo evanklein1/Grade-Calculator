@@ -148,14 +148,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String courseName = courseNameET.getText().toString();
-                Intent i = new Intent(MainActivity.this, CourseActivity.class);
-                //THIS IS A NEW COURSE
-                Bundle extras = new Bundle();
-                extras.putString(COURSE_NAME, courseName);
-                extras.putString(NEW_COURSE, TRUE);
-                i.putExtras(extras);
-                startActivity(i);
-                return;
+                //validate the courseName
+                if (validateCourseName(courseName)) {
+                    Intent i = new Intent(MainActivity.this, CourseActivity.class);
+                    //THIS IS A NEW COURSE
+                    Bundle extras = new Bundle();
+                    extras.putString(COURSE_NAME, courseName);
+                    extras.putString(NEW_COURSE, TRUE);
+                    i.putExtras(extras);
+                    startActivity(i);
+                    return;
+                }
             }
         });
         alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -168,6 +171,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 //        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
         AlertDialog alert = alertDB.create();
         alert.show();
+    }
+
+    public boolean validateCourseName(String name) {
+        if (student.containsCourseName(name)) {
+            //they can't enter this name
+            AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
+            alertDB.setMessage("This course is already in your list of courses. Please enter a different course name.");
+            alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    return;
+                }
+            });
+            AlertDialog alert = alertDB.create();
+            alert.show();
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     public void showSoftKeyboard(View view) {
