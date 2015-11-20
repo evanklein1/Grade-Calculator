@@ -446,7 +446,7 @@ public class CourseActivity extends AppCompatActivity
             public void onFocusChange(View v, boolean hasFocus) {
                 //if we just exited the type field
                 if (!hasFocus) {
-                    if (v.toString().contains("/")) {
+                    if (markET.getText().toString().contains("/")) {
                         //we lost focus, so we want to display this as a percentage, but save the fraction
                         fractionMarks.put(currentRowNum, v.toString());
                         Assessment currentA = course.getAssessment(currentRowNum);
@@ -520,8 +520,9 @@ public class CourseActivity extends AppCompatActivity
                         currentA.setMark(0.0);
                     }
                     //calculateRequiredMark();
-                    updateTotals();
+                    //updateTotals();
                 }
+                updateTotals();
             }
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
