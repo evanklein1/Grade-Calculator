@@ -6,6 +6,7 @@ package me.evanklein.finalexamcalculator;
 public class Assessment {
     private boolean marked;
     private Double mark;
+    private String markSTR;
     private Double worth;
     private String type;
     private Integer id;
@@ -36,6 +37,15 @@ public class Assessment {
     public void setMark(Double mark) {
         this.mark = mark;
     }
+
+    public String getMarkSTR() {
+        return markSTR;
+    }
+
+    public void setMarkSTR(String markSTR) {
+        this.markSTR = markSTR;
+    }
+
 
     public Double getWorth() {
         return worth;
