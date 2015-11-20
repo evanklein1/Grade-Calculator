@@ -17,6 +17,7 @@ public class AssessmentDataSource {
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_TYPE = "type";
     public static final String COLUMN_MARK = "mark";
+    public static final String COLUMN_MARK_STRING = "mark_string";
     public static final String COLUMN_MARKED = "marked";
     public static final String COLUMN_WORTH = "worth";
     // Database creation sql statement
@@ -26,6 +27,7 @@ public class AssessmentDataSource {
             + COLUMN_ID + " integer not null, "
             + COLUMN_TYPE + " text, "
             + COLUMN_MARK + " float, "
+            + COLUMN_MARK_STRING + " text, "
             + COLUMN_MARKED + " boolean, "
             + COLUMN_WORTH + " float, "
             + "PRIMARY KEY (" + COLUMN_COURSE + "," + COLUMN_ID + "));";

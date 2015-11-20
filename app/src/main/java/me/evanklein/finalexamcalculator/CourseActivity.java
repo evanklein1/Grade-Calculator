@@ -394,6 +394,7 @@ public class CourseActivity extends AppCompatActivity
             public void afterTextChanged(Editable s) {
                 updateTotals();
             }
+
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
@@ -446,9 +447,10 @@ public class CourseActivity extends AppCompatActivity
             public void onFocusChange(View v, boolean hasFocus) {
                 //if we just exited the type field
                 if (!hasFocus) {
-                    if (markET.getText().toString().contains("/")) {
+                    String markSTR = markET.getText().toString();
+                    if (markSTR.contains("/")) {
                         //we lost focus, so we want to display this as a percentage, but save the fraction
-                        fractionMarks.put(currentRowNum, v.toString());
+                        fractionMarks.put(currentRowNum, markSTR);
                         Assessment currentA = course.getAssessment(currentRowNum);
                         //we know currentA is not null because the markET is not empty (it contains "/")
                         markET.setText(formatDecimal(currentA.getMark()));
@@ -638,6 +640,7 @@ public class CourseActivity extends AppCompatActivity
     }
 
     public void addAssessmentsToDB() {
+        dropAndRecreateTable();
         Integer id = 1;
         for (Map.Entry<Integer, Assessment> aEntry : course.getAssessments().entrySet()) {
             //put all nonempty assessments in, with id incremented only when we've put one in
@@ -649,6 +652,7 @@ public class CourseActivity extends AppCompatActivity
                 assValues.put(AssessmentDataSource.COLUMN_ID, id);
                 assValues.put(AssessmentDataSource.COLUMN_TYPE, a.getType());
                 assValues.put(AssessmentDataSource.COLUMN_MARK, a.getMark());
+                assValues.put(AssessmentDataSource.COLUMN_MARK_STRING, fractionMarks.get(aEntry.getKey()));
                 assValues.put(AssessmentDataSource.COLUMN_MARKED, a.isMarked());
                 assValues.put(AssessmentDataSource.COLUMN_WORTH, a.getWorth());
                 db.insertOrThrow(
@@ -660,7 +664,11 @@ public class CourseActivity extends AppCompatActivity
             }
         }
     }
-
+    public void dropAndRecreateTable() {
+        String assessment_table = "DROP TABLE IF EXISTS assessment;";
+        db.execSQL(assessment_table);
+        db.execSQL(AssessmentDataSource.CREATE_COMMAND);
+    }
     public void deleteAllAssessmentsInDB() {
         //delete all assessments from the database
         SQLiteStatement stmt = db.compileStatement("DELETE FROM " + AssessmentDataSource.TABLE_NAME
