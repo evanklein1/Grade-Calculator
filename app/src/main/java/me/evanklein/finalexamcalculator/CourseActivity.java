@@ -234,6 +234,9 @@ public class CourseActivity extends AppCompatActivity
         }
         else {
             for (int i = 0; i < assessments.size(); i++) {
+                if (assessments.get(i).getMarkSTR() != null) {
+                    fractionMarks.put(i+1, assessments.get(i).getMarkSTR());
+                }
                 if (assessments.get(i).isEmpty()) {
                     //just add a blank row
                     addRow(i + 1, new Assessment("", 0.0, false, 0.0));

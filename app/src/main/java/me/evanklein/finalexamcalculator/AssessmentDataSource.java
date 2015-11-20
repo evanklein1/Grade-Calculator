@@ -97,6 +97,7 @@ public class AssessmentDataSource {
         assessment.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_ID)));
         assessment.setType(cursor.getString(cursor.getColumnIndex(COLUMN_TYPE)));
         assessment.setMark(cursor.getDouble(cursor.getColumnIndex(COLUMN_MARK)));
+        assessment.setMarkSTR(cursor.getString(cursor.getColumnIndex(COLUMN_MARK_STRING)));
         Boolean marked = (cursor.getInt(cursor.getColumnIndex(COLUMN_MARKED)) > 0);
         assessment.setMarked(marked);
         assessment.setWorth(cursor.getDouble(cursor.getColumnIndex(COLUMN_WORTH)));
