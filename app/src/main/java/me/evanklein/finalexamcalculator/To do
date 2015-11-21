@@ -4,6 +4,6 @@ You need a " + x + "% in the REST of the course to get a " + desiredGrade + "% i
 hiding keyboard
 
 delete an assessment - fix the button
-delete a course
+edit/delete a course - on update cascade not working
 
 what about when there are 8 exercises but only 5 of them have been marked?
