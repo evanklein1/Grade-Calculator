@@ -5,6 +5,5 @@ hiding keyboard
 
 delete an assessment - fix the button
 delete a course
-validate input
-    - when they enter a course name, check if that course is already in the database
-option to edit course name
+
+what about when there are 8 exercises but only 5 of them have been marked?

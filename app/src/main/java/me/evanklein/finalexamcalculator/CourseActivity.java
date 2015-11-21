@@ -82,6 +82,8 @@ public class CourseActivity extends AppCompatActivity
         mDrawerLayout.setDrawerListener(toggle);
         toggle.syncState();
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        registerForContextMenu(mDrawerList);
+
         //NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         //navigationView.setNavigationItemSelectedListener(this);
 
@@ -116,7 +118,9 @@ public class CourseActivity extends AppCompatActivity
         }
         else {
             courseName = extras.getString(MainActivity.COURSE_NAME);
-            getSupportActionBar().setTitle(courseName);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(courseName);
+            }
 
             if (extras.getString(MainActivity.NEW_COURSE).equals(MainActivity.TRUE)) {
                 //NEW COURSE
@@ -326,7 +330,7 @@ public class CourseActivity extends AppCompatActivity
     public void editCourseName(String oldName, String newName, Integer index) {
         if (oldName.equals(course.getName())) {
             //if we're editing the course we're currently in, just change the title
-            getActionBar().setTitle(newName);
+            getSupportActionBar().setTitle(newName);
             course.setName(newName);
         }
         //change it in the student class
@@ -344,10 +348,6 @@ public class CourseActivity extends AppCompatActivity
         //updateAssessmentTableOnEdit(oldName, newName);
         //change it in the drawers
         addDrawerItems();
-        //change it on the home screen
-        TextView courseNameET = (TextView) tableLayout.findViewWithTag("name_" + Integer.toString(index));
-        courseNameET.setText(newName);
-
     }
 
     public void addNewCourseNameListener(final EditText courseET) {
@@ -915,12 +915,6 @@ public class CourseActivity extends AppCompatActivity
             startActivity(i);
             // Highlight the selected item, update the title, and close the drawer
         }
-    }
-
-    @Override
-    public void setTitle(CharSequence title) {
-        CharSequence mTitle = title;
-        getActionBar().setTitle(mTitle);
     }
 
     public String formatDecimal(Double d) {
