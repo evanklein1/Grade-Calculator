@@ -121,23 +121,24 @@ public class CourseActivity extends AppCompatActivity
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setTitle(courseName);
             }
-
+            List<Assessment> assessments;
             if (extras.getString(MainActivity.NEW_COURSE).equals(MainActivity.TRUE)) {
                 //NEW COURSE
                 newCourse = true;
                 course = new Course();
                 course.setName(courseName);
-                addRow(1, new Assessment("", 0.0, false, 0.0));
+                assessments = new ArrayList<Assessment>();
+ //               addRow(1, new Assessment("", 0.0, false, 0.0));
 
-                final EditText type1EditText = (EditText) findViewById(R.id.type_1);
-                final EditText yourMark1EditText = (EditText) findViewById(R.id.your_mark_1);
-                final EditText worth1EditText = (EditText) findViewById(R.id.worth_1);
-                final Button delBtn1 = (Button) findViewById(R.id.del_btn_1);
-                setTypeListener(type1EditText, 1);
-                setMarkListener(yourMark1EditText, 1);
-                setWorthListener(worth1EditText, 1);
-                setButtonListener(delBtn1, 1);
-                numRows += 1;
+//                final EditText type1EditText = (EditText) findViewById(R.id.type_1);
+//                final EditText yourMark1EditText = (EditText) findViewById(R.id.your_mark_1);
+//                final EditText worth1EditText = (EditText) findViewById(R.id.worth_1);
+//                final Button delBtn1 = (Button) findViewById(R.id.del_btn_1);
+//                setTypeListener(type1EditText, 1);
+//                setMarkListener(yourMark1EditText, 1);
+//                setWorthListener(worth1EditText, 1);
+//                setButtonListener(delBtn1, 1);
+//                numRows += 1;
             }
             else {
                 //EXISTING COURSE
@@ -148,17 +149,17 @@ public class CourseActivity extends AppCompatActivity
                 //hopefully courses just contains one course
                 course = courses.get(0);
                 String selection = String.format("%s = ?", AssessmentDataSource.COLUMN_COURSE);
-                List<Assessment> assessments = assessmentDS.read(selection, whereArgs, null, null, "id");
+                assessments = assessmentDS.read(selection, whereArgs, null, null, "id");
                 //if assessments is empty, this is a new course
                 //this is an existing course
                 //so we want to iterate through all the assessments and display them in a table layout
                 newCourse = false;
-                displayAssessments(assessments);
                 // display the desired grade
                 //get the desired grade from the database
                 desiredGradeET.setText(formatDecimal(course.getDesiredGrade()));
-                updateTotals();
             }
+            displayAssessments(assessments);
+            updateTotals();
         }
         setTouchListener();
         //set sidebar items
