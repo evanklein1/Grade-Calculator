@@ -375,6 +375,10 @@ public class CourseActivity extends AppCompatActivity
             public void onClick(DialogInterface dialog, int whichButton) {
                 //delete assessment
                 course.removeAssessment(currentRowNum);
+                if (currentRowNum.equals(numRows)) {
+                    //if we are deleting the last row, decrease the number of rows
+                    numRows -= 1;
+                }
                 //delete row
                 tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(currentRowNum)));
                 //if we removed all the rows, need to add a first one in

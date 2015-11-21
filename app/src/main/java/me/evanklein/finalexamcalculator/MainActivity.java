@@ -77,20 +77,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getLoaderManager().initLoader(LOADER_ID, null, this);
         //initialize a student object, which is a singleton class and represents the student using
         //the app
-        dropAndRecreateTables();
-//        student = Student.getInstance();
-//        //get all the courses from the database
-//        List<Course> courses = mDataSource.read();
-//        student.setCourses((ArrayList) courses);
-//        addDrawerItems();
-//        //if courses are empty, want to just print a string telling them to add courses
-//        if (courses.size() == 0) {
-//            displayNoCoursesMessage();
-//        }
-//        else {
-//            //now we want to iterate through all the assessments and display them in a table layout
-//            displayCourses();
-//        }
+        student = Student.getInstance();
+        //get all the courses from the database
+        List<Course> courses = mDataSource.read();
+        student.setCourses((ArrayList) courses);
+        addDrawerItems();
+        //if courses are empty, want to just print a string telling them to add courses
+        if (courses.size() == 0) {
+            displayNoCoursesMessage();
+        }
+        else {
+            //now we want to iterate through all the assessments and display them in a table layout
+            displayCourses();
+        }
     }
 
     public void dropAndRecreateTables() {
