@@ -17,6 +17,7 @@ import android.view.ContextMenu;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -184,8 +185,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             });
             showSoftKeyboard(newNameET);
             AlertDialog alert = alertDB.create();
+            alert.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
             alert.show();
             newNameET.requestFocus();
+            newNameET.setText(oldName);
         }
         else {//menu item index is 1 -> delete course
             areYouSure(oldName, info.position);
