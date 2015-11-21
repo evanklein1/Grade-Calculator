@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -150,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
         int menuItemIndex = item.getItemId();
         final String oldName = student.getCourses().get(info.position-1).getName();
 
@@ -159,25 +160,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             //put an alertdialog with the coursename already filled in
             AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
             alertDB.setMessage("Please enter a new name for this course:");
-            final EditText courseNameET = new EditText(this);
-            alertDB.setView(courseNameET);
+            final EditText newNameET = new EditText(this);
+            alertDB.setView(newNameET);
             alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                    String newName = courseNameET.getText().toString();
+                    String newName = newNameET.getText().toString();
                     //if they didn't change anything, don't change anything
                     if (newName.equals(oldName)) {
                         return;
                     }
                     else {
                         //validate the courseName
-                        if (validateCourseName(courseName)) {
-                            //change this course's name in the database
-
-                            //change it in the drawers
-
-                            //change it on the home screen
-
-                            //change it in the student class
+                        if (validateCourseName(newName)) {
+                            editCourseName(oldName, newName, info.position-1);
                         }
                     }
                 }
@@ -187,18 +182,34 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     return;
                 }
             });
-            showSoftKeyboard(courseNameET);
-//        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
+            showSoftKeyboard(newNameET);
             AlertDialog alert = alertDB.create();
             alert.show();
-            courseNameET.requestFocus();
+            newNameET.requestFocus();
         }
-
-        TextView text = (TextView)findViewById(R.id.footer);
-        text.setText(String.format("Selected %s for item %s", menuItemName, listItemName));
         return true;
     }
+
+    public void editCourseName(String oldName, String newName, Integer index) {
+        //change it in the student class
+        student.changeCourse(oldName, newName);
+        //change this course's name in the database
+        SQLiteStatement stmt = db.compileStatement(
+                "UPDATE " + CourseDataSource.TABLE_NAME
+                        + " SET " + CourseDataSource.COLUMN_NAME + " = ?"
+                        + " WHERE " + CourseDataSource.COLUMN_NAME + " = ?");
+//        "UPDATE course SET name='CSC374' where name='CSC373'"
+        stmt.bindString(1, newName);
+        stmt.bindString(2, oldName);
+        stmt.execute();
+        //change it in the drawers
+        addDrawerItems();
+        //change it on the home screen
+        EditText courseNameET = (EditText) tableLayout.findViewWithTag("row_" + Integer.toString(index));
+        courseNameET.setText(newName);
+    }
+
+
     public void promptCourseName(View view) {
         //ask for course name
         AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
@@ -234,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     public boolean validateCourseName(String name) {
-        if (student.containsCourseName(name)) {
+        if (student.getCourseWithName(name)!=null) {
             //they can't enter this name
             AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
             alertDB.setMessage("This course is already in your list of courses. Please enter a different course name.");

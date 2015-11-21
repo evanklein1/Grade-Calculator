@@ -15,13 +15,20 @@ public class Student {
         return courses;
     }
 
-    public boolean containsCourseName(String name) {
+    public Course getCourseWithName(String name) {
         for (Course c: courses) {
             if (name.equals(c.getName())) {
-                return true;
+                return c;
             }
         }
-        return false;
+        return null;
+    }
+    public void changeCourse(String oldName, String newName) {
+        for (Course c: courses) {
+            if (oldName.equals(c.getName())) {
+                c.setName(newName);
+            }
+        }
     }
     //create an object of SingleObject
     private static Student instance = new Student();
