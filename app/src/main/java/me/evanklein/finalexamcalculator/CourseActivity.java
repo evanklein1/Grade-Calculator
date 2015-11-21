@@ -704,8 +704,9 @@ public class CourseActivity extends AppCompatActivity
         });
         AlertDialog alert = alertDB.create();
         alert.show();
-
-            addDrawerItems();
+        addDrawerItems();
+        //go home
+        startActivity(new Intent(this, MainActivity.class));
         //add course to sidebar
 //        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 //        mDrawerList = (ListView) findViewById(R.id.left_drawer);
