@@ -13,6 +13,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.View;
 import android.view.Menu;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private DBHelper mDbHelper;
     private static final int LOADER_ID = 1;
     private TableLayout tableLayout;
+    private static boolean isValid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,8 +172,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     //if they didn't change anything, don't change anything
                     if (newName.equals(oldName)) {
                         return;
-                    }
-                    else {
+                    } else {
                         //validate the courseName
                         if (validateCourseName(newName)) {
                             editCourseName(oldName, newName, info.position);
@@ -187,8 +189,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             AlertDialog alert = alertDB.create();
             alert.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
             alert.show();
-            newNameET.requestFocus();
             newNameET.setText(oldName);
+            newNameET.setSelection(oldName.length());
         }
         else {//menu item index is 1 -> delete course
             areYouSure(oldName, info.position);
@@ -265,15 +267,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 //    }
     public void promptCourseName(View view) {
         //ask for course name
+        Boolean inputValid = true;
         AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
         alertDB.setMessage("Enter the name of the course:");
         final EditText courseNameET = new EditText(this);
+        addNewCourseNameListener(courseNameET);
         alertDB.setView(courseNameET);
         alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String courseName = courseNameET.getText().toString();
                 //validate the courseName
-                if (validateCourseName(courseName)) {
+                if (isValid) {
                     Intent i = new Intent(MainActivity.this, CourseActivity.class);
                     //THIS IS A NEW COURSE
                     Bundle extras = new Bundle();
@@ -294,9 +298,29 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 //        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 //        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
         AlertDialog alert = alertDB.create();
+        alert.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alert.show();
     }
 
+    public void addNewCourseNameListener(final EditText courseET) {
+        courseET.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+                //just check if that name already exists
+                String courseSTR = s.toString();
+                if (student.getCourseWithName(courseSTR) != null) {
+                    courseET.setError("This course is already in your list of courses! Please enter a different course name.");
+                    isValid = false;
+                }
+                else {
+                    isValid = true;
+                }
+            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
+    }
     public boolean validateCourseName(String name) {
         if (student.getCourseWithName(name)!=null) {
             //they can't enter this name
