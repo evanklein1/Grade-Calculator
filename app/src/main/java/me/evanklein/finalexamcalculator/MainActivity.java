@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ContextMenu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -90,7 +91,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             //now we want to iterate through all the assessments and display them in a table layout
             displayCourses();
         }
+        setTouchListener();
     }
+
+
+    public void setTouchListener() {
+        findViewById(R.id.main_layout).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent ev) {
+                hideKeyboard(view);
+                return false;
+            }
+        });
+    };
+
+    public void hideKeyboard(View view) {
+        InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        in.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+
 
     public void dropAndRecreateTables() {
         String assessmentTable = "DROP TABLE IF EXISTS assessment;";

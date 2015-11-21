@@ -18,6 +18,7 @@ import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.util.TypedValue;
 import android.view.ContextMenu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -752,20 +753,18 @@ public class CourseActivity extends AppCompatActivity
     }
 
     public void setTouchListener() {
-        findViewById(R.id.main_layout).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.main_layout).setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-//                InputMethodManager imm = (InputMethodManager) view.getContext()
-//                        .getSystemService(Context.INPUT_METHOD_SERVICE);
-//                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            public boolean onTouch(View view, MotionEvent ev) {
+                hideKeyboard(view);
+                return false;
             }
         });
     };
 
     public void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        in.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     public void addCourseToDB() {
