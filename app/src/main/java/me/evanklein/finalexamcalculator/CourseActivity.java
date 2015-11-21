@@ -279,17 +279,27 @@ public class CourseActivity extends AppCompatActivity
             newNameET.setSelection(oldName.length());
         }
         else {//menu item index is 1 -> delete course
-            areYouSureCourse(oldName, info.position);
+            Boolean deleteActiveCourse = false;
+            if (info.position == (student.getCourses().indexOf(course)+1)) {
+                deleteActiveCourse = true;
+            }
+            areYouSureCourse(oldName, deleteActiveCourse);
+
         }
         return true;
     }
 
-    public void areYouSureCourse(final String courseToDelete, final Integer currentRowNum) {
+    public void areYouSureCourse(final String courseToDelete, final Boolean delActvCourse) {
         AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
         alertDB.setMessage("Are you sure you want to delete \"" + courseToDelete + "\"?");
         alertDB.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                deleteCourse(courseToDelete, currentRowNum);
+                deleteCourse(courseToDelete);
+                if (delActvCourse) {
+                    //go home
+                    startActivity(new Intent(CourseActivity.this, MainActivity.class));
+                }
+
             }
         });
         alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -300,7 +310,7 @@ public class CourseActivity extends AppCompatActivity
         AlertDialog alert = alertDB.create();
         alert.show();
     }
-    public void deleteCourse(String toDeleteName, Integer index) {
+    public void deleteCourse(String toDeleteName) {
         //change it in the student class
         student.removeCourseWithName(toDeleteName);
         //delete it from the database
@@ -312,10 +322,13 @@ public class CourseActivity extends AppCompatActivity
         stmt.execute();
         //change it in the drawers
         addDrawerItems();
-        //change it on the home screen
-        tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(index)));
     }
     public void editCourseName(String oldName, String newName, Integer index) {
+        if (oldName.equals(course.getName())) {
+            //if we're editing the course we're currently in, just change the title
+            getActionBar().setTitle(newName);
+            course.setName(newName);
+        }
         //change it in the student class
         student.changeCourse(oldName, newName);
         //change this course's name in the database
@@ -334,6 +347,7 @@ public class CourseActivity extends AppCompatActivity
         //change it on the home screen
         TextView courseNameET = (TextView) tableLayout.findViewWithTag("name_" + Integer.toString(index));
         courseNameET.setText(newName);
+
     }
 
     public void addNewCourseNameListener(final EditText courseET) {
@@ -882,7 +896,7 @@ public class CourseActivity extends AppCompatActivity
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
         }
-        else if (position == (student.getCourses().indexOf(course.getName())+1)) {
+        else if (position == (student.getCourses().indexOf(course)+1)) {
             //they selected the current course, do nothing, just close drawer
             mDrawerLayout.closeDrawers();
         }
