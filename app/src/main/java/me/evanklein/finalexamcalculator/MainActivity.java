@@ -188,29 +188,46 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             newNameET.requestFocus();
         }
         else {//menu item index is 1 -> delete course
-
-
+            areYouSure(oldName, info.position);
         }
         return true;
     }
 
-    public void deleteCourse(String toDeleteName) {
+    public void areYouSure(final String courseToDelete, final Integer currentRowNum) {
+        AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
+        alertDB.setMessage("Are you sure you want to delete \"" + courseToDelete + "\"?");
+        alertDB.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                deleteCourse(courseToDelete, currentRowNum);
+                //if we removed all the rows, need to add a first one in
+                if (student.getCourses().size() == 0) {
+                    displayNoCoursesMessage();
+                    return;
+                }
+            }
+        });
+        alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                return;
+            }
+        });
+        AlertDialog alert = alertDB.create();
+        alert.show();
+    }
+    public void deleteCourse(String toDeleteName, Integer index) {
         //change it in the student class
         student.removeCourseWithName(toDeleteName);
         //delete it from the database
         SQLiteStatement stmt = db.compileStatement(
-                "UPDATE " + CourseDataSource.TABLE_NAME
-                        + " SET " + CourseDataSource.COLUMN_NAME + " = ?"
+                "DELETE FROM " + CourseDataSource.TABLE_NAME
                         + " WHERE " + CourseDataSource.COLUMN_NAME + " = ?");
 //        "UPDATE course SET name='CSC374' where name='CSC373'"
-        stmt.bindString(1, newName);
-        stmt.bindString(2, oldName);
+        stmt.bindString(1, toDeleteName);
         stmt.execute();
         //change it in the drawers
         addDrawerItems();
         //change it on the home screen
-        EditText courseNameET = (EditText) tableLayout.findViewWithTag("row_" + Integer.toString(index));
-        courseNameET.setText(newName);
+        tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(index)));
     }
     public void editCourseName(String oldName, String newName, Integer index) {
         //change it in the student class
@@ -225,24 +242,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         stmt.bindString(2, oldName);
         stmt.execute();
         //also need to update the assessment table
-        updateAssessmentTableOnEdit(oldName, newName);
+        //updateAssessmentTableOnEdit(oldName, newName);
         //change it in the drawers
         addDrawerItems();
         //change it on the home screen
-        EditText courseNameET = (EditText) tableLayout.findViewWithTag("row_" + Integer.toString(index));
+        EditText courseNameET = (EditText) tableLayout.findViewWithTag("name_" + Integer.toString(index));
         courseNameET.setText(newName);
     }
 
-    public void updateAssessmentTableOnEdit(String oldName, String newName) {
-        SQLiteStatement stmtA = db.compileStatement(
-                "UPDATE " + AssessmentDataSource.TABLE_NAME
-                        + " SET " + AssessmentDataSource.COLUMN_COURSE + " = ?"
-                        + " WHERE " + AssessmentDataSource.COLUMN_COURSE + " = ?");
-//        "UPDATE assessment SET name='CSC374' where name='CSC373'"
-        stmtA.bindString(1, newName);
-        stmtA.bindString(2, oldName);
-        stmtA.execute();
-    }
+//    public void updateAssessmentTableOnEdit(String oldName, String newName) {
+//        SQLiteStatement stmtA = db.compileStatement(
+//                "UPDATE " + AssessmentDataSource.TABLE_NAME
+//                        + " SET " + AssessmentDataSource.COLUMN_COURSE + " = ?"
+//                        + " WHERE " + AssessmentDataSource.COLUMN_COURSE + " = ?");
+////        "UPDATE assessment SET name='CSC374' where name='CSC373'"
+//        stmtA.bindString(1, newName);
+//        stmtA.bindString(2, oldName);
+//        stmtA.execute();
+//    }
     public void promptCourseName(View view) {
         //ask for course name
         AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
