@@ -80,6 +80,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:id="@+id/type_1"
+                            android:inputType="text"
                             android:hint="Test, etc."
                             android:layout_column="0" />
 

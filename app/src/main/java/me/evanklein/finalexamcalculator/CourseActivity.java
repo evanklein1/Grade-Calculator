@@ -65,7 +65,6 @@ public class CourseActivity extends AppCompatActivity
     private ArrayAdapter<String> mAdapter;
     private Student student;
     private EditText desiredGradeET;
-    private HashMap<Integer, Assessment> newAssessments =  new HashMap<Integer, Assessment>();
     private HashMap<Integer, String> fractionMarks = new HashMap<Integer, String>();
     private static boolean isCourseValid = true;
 
@@ -128,6 +127,8 @@ public class CourseActivity extends AppCompatActivity
                 newCourse = true;
                 course = new Course();
                 course.setName(courseName);
+                addRow(1, new Assessment("", 0.0, false, 0.0));
+
                 final EditText type1EditText = (EditText) findViewById(R.id.type_1);
                 final EditText yourMark1EditText = (EditText) findViewById(R.id.your_mark_1);
                 final EditText worth1EditText = (EditText) findViewById(R.id.worth_1);
@@ -136,7 +137,6 @@ public class CourseActivity extends AppCompatActivity
                 setMarkListener(yourMark1EditText, 1);
                 setWorthListener(worth1EditText, 1);
                 setButtonListener(delBtn1, 1);
-                newAssessments.put(1, new Assessment("", 0.0, false, 0.0));
                 numRows += 1;
             }
             else {
@@ -424,10 +424,12 @@ public class CourseActivity extends AppCompatActivity
         newType.setHint("Test, etc.");
         newType.setMinWidth(getSizeInDP(60));
         newType.setMaxWidth(getSizeInDP(60));
+        newType.setInputType(InputType.TYPE_CLASS_TEXT);
         String yourMarkString = "your_mark_" + Integer.toString(currentRowNum);
         newYourMark.setTag(yourMarkString);
         newYourMark.setLayoutParams(newYourMarkLayoutParams);
         newYourMark.setInputType(InputType.TYPE_CLASS_NUMBER);
+        newYourMark.setHint("ex: 15/20, or 75");
         newYourMark.setKeyListener(DigitsKeyListener.getInstance("0123456789./"));
         newYourMark.setMinWidth(getSizeInDP(10));
         newYourMark.setMaxWidth(getSizeInDP(10));
@@ -456,10 +458,6 @@ public class CourseActivity extends AppCompatActivity
 //            disableEditText(newType);
 //            disableEditText(newYourMark);
 //            disableEditText(newWorth);
-        }
-        else {
-            //if we're adding an empty assessment, it is a new assessment
-            newAssessments.put(currentRowNum, a);
         }
         tableRow.addView(newType);
         tableRow.addView(newYourMark);
