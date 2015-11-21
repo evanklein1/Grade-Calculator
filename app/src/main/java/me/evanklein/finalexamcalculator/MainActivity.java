@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private DBHelper mDbHelper;
     private static final int LOADER_ID = 1;
     private TableLayout tableLayout;
-    private static boolean isValid;
+    private static boolean isValid = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,21 +77,30 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getLoaderManager().initLoader(LOADER_ID, null, this);
         //initialize a student object, which is a singleton class and represents the student using
         //the app
-        student = Student.getInstance();
-        //get all the courses from the database
-        List<Course> courses = mDataSource.read();
-        student.setCourses((ArrayList) courses);
-        addDrawerItems();
-        //if courses are empty, want to just print a string telling them to add courses
-        if (courses.size() == 0) {
-            displayNoCoursesMessage();
-        }
-        else {
-            //now we want to iterate through all the assessments and display them in a table layout
-            displayCourses();
-        }
+        dropAndRecreateTables();
+//        student = Student.getInstance();
+//        //get all the courses from the database
+//        List<Course> courses = mDataSource.read();
+//        student.setCourses((ArrayList) courses);
+//        addDrawerItems();
+//        //if courses are empty, want to just print a string telling them to add courses
+//        if (courses.size() == 0) {
+//            displayNoCoursesMessage();
+//        }
+//        else {
+//            //now we want to iterate through all the assessments and display them in a table layout
+//            displayCourses();
+//        }
     }
 
+    public void dropAndRecreateTables() {
+        String assessmentTable = "DROP TABLE IF EXISTS assessment;";
+        db.execSQL(assessmentTable);
+        String courseTable = "DROP TABLE IF EXISTS course;";
+        db.execSQL(courseTable);
+        db.execSQL(CourseDataSource.CREATE_COMMAND);
+        db.execSQL(AssessmentDataSource.CREATE_COMMAND);
+    }
     @Override
     public Loader<List<Course>> onCreateLoader(int id, Bundle args) {
         CourseLoader loader = new CourseLoader(getApplicationContext(), mDataSource, null, null, null, null, null);
@@ -166,18 +175,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             alertDB.setMessage("Please enter a new name for this course:");
             final EditText newNameET = new EditText(this);
             alertDB.setView(newNameET);
+            addNewCourseNameListener(newNameET);
             alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     String newName = newNameET.getText().toString();
                     //if they didn't change anything, don't change anything
-                    if (newName.equals(oldName)) {
-                        return;
-                    } else {
+//                    if (newName.equals(oldName)) {
+//                        return;
+//                    } else {
                         //validate the courseName
-                        if (validateCourseName(newName)) {
+                        if (isValid) {
                             editCourseName(oldName, newName, info.position);
                         }
-                    }
+//                    }
                 }
             });
             alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -251,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         //change it in the drawers
         addDrawerItems();
         //change it on the home screen
-        EditText courseNameET = (EditText) tableLayout.findViewWithTag("name_" + Integer.toString(index));
+        TextView courseNameET = (TextView) tableLayout.findViewWithTag("name_" + Integer.toString(index));
         courseNameET.setText(newName);
     }
 

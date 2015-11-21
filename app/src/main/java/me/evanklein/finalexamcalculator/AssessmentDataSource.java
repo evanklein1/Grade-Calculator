@@ -33,6 +33,7 @@ public class AssessmentDataSource {
             + "PRIMARY KEY (" + COLUMN_COURSE + "," + COLUMN_ID + ")" +
             "FOREIGN KEY (" + COLUMN_COURSE + ") REFERENCES " + CourseDataSource.TABLE_NAME + "(" +
             CourseDataSource.COLUMN_NAME + ")" +
+            "ON UPDATE CASCADE ON DELETE CASCADE" +
             ");";
     public AssessmentDataSource(SQLiteDatabase database) {
         mDatabase = database;

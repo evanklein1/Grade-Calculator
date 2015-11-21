@@ -21,7 +21,6 @@ public class CourseDataSource {
             + COLUMN_CURRENT_GRADE + " float, "
             + COLUMN_DESIRED_GRADE + " float, "
             + "PRIMARY KEY (" + COLUMN_NAME + ") " +
-            "ON UPDATE CASCADE ON DELETE CASCADE" +
             ");";
     public CourseDataSource(SQLiteDatabase database) {
         mDatabase = database;

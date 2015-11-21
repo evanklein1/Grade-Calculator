@@ -27,6 +27,7 @@ public class Student {
         for (Course c: courses) {
             if (oldName.equals(c.getName())) {
                 c.setName(newName);
+                break;
             }
         }
     }
