@@ -53,6 +53,14 @@ public class Student {
     public void removeCourse(Course course) {
         courses.remove(course);
     }
+    public void removeCourseWithName(String name) {
+        for (Course c: courses) {
+            if (name.equals(c.getName())) {
+                courses.remove(c);
+                break;
+            }
+        }
+    }
     public double getDesiredAverage() {
         return desiredAverage;
     }

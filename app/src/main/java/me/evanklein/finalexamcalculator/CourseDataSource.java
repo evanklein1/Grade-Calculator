@@ -19,7 +19,8 @@ public class CourseDataSource {
     public static final String CREATE_COMMAND = "create table " + TABLE_NAME
             + "(" + COLUMN_NAME + " text not null, "
             + COLUMN_CURRENT_GRADE + " float, "
-            + COLUMN_DESIRED_GRADE + " float);";
+            + COLUMN_DESIRED_GRADE + " float, "
+            + "PRIMARY KEY (" + COLUMN_NAME + "));";
     public CourseDataSource(SQLiteDatabase database) {
         mDatabase = database;
     }

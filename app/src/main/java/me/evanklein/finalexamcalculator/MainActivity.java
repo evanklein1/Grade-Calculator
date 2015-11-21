@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     else {
                         //validate the courseName
                         if (validateCourseName(newName)) {
-                            editCourseName(oldName, newName, info.position-1);
+                            editCourseName(oldName, newName, info.position);
                         }
                     }
                 }
@@ -187,13 +187,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             alert.show();
             newNameET.requestFocus();
         }
+        else {//menu item index is 1 -> delete course
+
+
+        }
         return true;
     }
 
-    public void editCourseName(String oldName, String newName, Integer index) {
+    public void deleteCourse(String toDeleteName) {
         //change it in the student class
-        student.changeCourse(oldName, newName);
-        //change this course's name in the database
+        student.removeCourseWithName(toDeleteName);
+        //delete it from the database
         SQLiteStatement stmt = db.compileStatement(
                 "UPDATE " + CourseDataSource.TABLE_NAME
                         + " SET " + CourseDataSource.COLUMN_NAME + " = ?"
@@ -208,8 +212,37 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         EditText courseNameET = (EditText) tableLayout.findViewWithTag("row_" + Integer.toString(index));
         courseNameET.setText(newName);
     }
+    public void editCourseName(String oldName, String newName, Integer index) {
+        //change it in the student class
+        student.changeCourse(oldName, newName);
+        //change this course's name in the database
+        SQLiteStatement stmt = db.compileStatement(
+                "UPDATE " + CourseDataSource.TABLE_NAME
+                        + " SET " + CourseDataSource.COLUMN_NAME + " = ?"
+                        + " WHERE " + CourseDataSource.COLUMN_NAME + " = ?");
+//        "UPDATE course SET name='CSC374' where name='CSC373'"
+        stmt.bindString(1, newName);
+        stmt.bindString(2, oldName);
+        stmt.execute();
+        //also need to update the assessment table
+        updateAssessmentTableOnEdit(oldName, newName);
+        //change it in the drawers
+        addDrawerItems();
+        //change it on the home screen
+        EditText courseNameET = (EditText) tableLayout.findViewWithTag("row_" + Integer.toString(index));
+        courseNameET.setText(newName);
+    }
 
-
+    public void updateAssessmentTableOnEdit(String oldName, String newName) {
+        SQLiteStatement stmtA = db.compileStatement(
+                "UPDATE " + AssessmentDataSource.TABLE_NAME
+                        + " SET " + AssessmentDataSource.COLUMN_COURSE + " = ?"
+                        + " WHERE " + AssessmentDataSource.COLUMN_COURSE + " = ?");
+//        "UPDATE assessment SET name='CSC374' where name='CSC373'"
+        stmtA.bindString(1, newName);
+        stmtA.bindString(2, oldName);
+        stmtA.execute();
+    }
     public void promptCourseName(View view) {
         //ask for course name
         AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
