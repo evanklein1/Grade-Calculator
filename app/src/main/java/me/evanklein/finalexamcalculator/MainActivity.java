@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     final static String NEW_COURSE = "newCourse";
     final static String TRUE = "True";
     final static String FALSE = "False";
-    String[] menuItems = {"Edit Name", "Delete Course"};
+    public static String[] menuItems = {"Edit Name", "Delete Course"};
     private Student student;
     private ArrayAdapter<String> mAdapter;
     private SQLiteDatabase db;
@@ -316,6 +316,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void afterTextChanged(Editable s) {
                 //just check if that name already exists
                 String courseSTR = s.toString();
+                courseSTR.replace(" ", "");
                 if (student.getCourseWithName(courseSTR) != null) {
                     courseET.setError("This course is already in your list of courses! Please enter a different course name.");
                     isValid = false;
@@ -385,7 +386,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         //if assessments is empty, this is a new course
         ArrayList<Course> courses = student.getCourses();
         for(int i = 0; i < courses.size(); i++) {
-            addRow(i, courses.get(i));
+            addRow(i+1, courses.get(i));
         }
     }
 
@@ -399,6 +400,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         tableRow.addView(noCoursesTV);
         tableLayout.addView(tableRow, params);
     }
+    /* The rows start counting at 1 */
     public void addRow(final Integer currentRowNum, Course c) {
         TableRow tableRow = new TableRow(this);
         TableRow.LayoutParams params = new TableRow.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT);

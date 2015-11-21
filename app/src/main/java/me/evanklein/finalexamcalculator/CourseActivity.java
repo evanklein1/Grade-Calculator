@@ -17,6 +17,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.util.TypedValue;
+import android.view.ContextMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -26,6 +27,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -64,6 +66,7 @@ public class CourseActivity extends AppCompatActivity
     private EditText desiredGradeET;
     private HashMap<Integer, Assessment> newAssessments =  new HashMap<Integer, Assessment>();
     private HashMap<Integer, String> fractionMarks = new HashMap<Integer, String>();
+    private static boolean isCourseValid = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -224,6 +227,134 @@ public class CourseActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId()==mDrawerList.getId()) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+            for (int i = 0; i<MainActivity.menuItems.length; i++) {
+                menu.add(Menu.NONE, i, i, MainActivity.menuItems[i]);
+            }
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        int menuItemIndex = item.getItemId();
+        final String oldName = student.getCourses().get(info.position-1).getName();
+
+        if (menuItemIndex == 0) {
+            //Edit course name
+            //put an alertdialog with the coursename already filled in
+            AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
+            alertDB.setMessage("Please enter a new name for this course:");
+            final EditText newNameET = new EditText(this);
+            alertDB.setView(newNameET);
+            addNewCourseNameListener(newNameET);
+            alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    String newName = newNameET.getText().toString();
+                    //if they didn't change anything, don't change anything
+//                    if (newName.equals(oldName)) {
+//                        return;
+//                    } else {
+                    //validate the courseName
+                    if (isCourseValid) {
+                        editCourseName(oldName, newName, info.position);
+                    }
+//                    }
+                }
+            });
+            alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    return;
+                }
+            });
+            AlertDialog alert = alertDB.create();
+            alert.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+            alert.show();
+            newNameET.setText(oldName);
+            newNameET.setSelection(oldName.length());
+        }
+        else {//menu item index is 1 -> delete course
+            areYouSureCourse(oldName, info.position);
+        }
+        return true;
+    }
+
+    public void areYouSureCourse(final String courseToDelete, final Integer currentRowNum) {
+        AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
+        alertDB.setMessage("Are you sure you want to delete \"" + courseToDelete + "\"?");
+        alertDB.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                deleteCourse(courseToDelete, currentRowNum);
+            }
+        });
+        alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                return;
+            }
+        });
+        AlertDialog alert = alertDB.create();
+        alert.show();
+    }
+    public void deleteCourse(String toDeleteName, Integer index) {
+        //change it in the student class
+        student.removeCourseWithName(toDeleteName);
+        //delete it from the database
+        SQLiteStatement stmt = db.compileStatement(
+                "DELETE FROM " + CourseDataSource.TABLE_NAME
+                        + " WHERE " + CourseDataSource.COLUMN_NAME + " = ?");
+//        "UPDATE course SET name='CSC374' where name='CSC373'"
+        stmt.bindString(1, toDeleteName);
+        stmt.execute();
+        //change it in the drawers
+        addDrawerItems();
+        //change it on the home screen
+        tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(index)));
+    }
+    public void editCourseName(String oldName, String newName, Integer index) {
+        //change it in the student class
+        student.changeCourse(oldName, newName);
+        //change this course's name in the database
+        SQLiteStatement stmt = db.compileStatement(
+                "UPDATE " + CourseDataSource.TABLE_NAME
+                        + " SET " + CourseDataSource.COLUMN_NAME + " = ?"
+                        + " WHERE " + CourseDataSource.COLUMN_NAME + " = ?");
+//        "UPDATE course SET name='CSC374' where name='CSC373'"
+        stmt.bindString(1, newName);
+        stmt.bindString(2, oldName);
+        stmt.execute();
+        //also need to update the assessment table
+        //updateAssessmentTableOnEdit(oldName, newName);
+        //change it in the drawers
+        addDrawerItems();
+        //change it on the home screen
+        TextView courseNameET = (TextView) tableLayout.findViewWithTag("name_" + Integer.toString(index));
+        courseNameET.setText(newName);
+    }
+
+    public void addNewCourseNameListener(final EditText courseET) {
+        courseET.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+                //just check if that name already exists
+                String courseSTR = s.toString();
+                courseSTR.replace(" ", "");
+                if (student.getCourseWithName(courseSTR) != null) {
+                    courseET.setError("This course is already in your list of courses! Please enter a different course name.");
+                    isCourseValid = false;
+                }
+                else {
+                    isCourseValid = true;
+                }
+            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
     }
 
     public void displayAssessments(List<Assessment> assessments) {
