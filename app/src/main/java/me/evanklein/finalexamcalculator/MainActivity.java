@@ -8,12 +8,11 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
+import android.view.ContextMenu;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,9 +25,6 @@ import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     final static String NEW_COURSE = "newCourse";
     final static String TRUE = "True";
     final static String FALSE = "False";
+    String[] menuItems = {"Edit Name", "Delete Course"};
     private Student student;
     private ArrayAdapter<String> mAdapter;
     private SQLiteDatabase db;
@@ -64,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mDrawerLayout.setDrawerListener(toggle);
         toggle.syncState();
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        registerForContextMenu(mDrawerList);
+
         mDbHelper = new DBHelper(getApplicationContext());
         db = mDbHelper.getWritableDatabase();
         mDataSource = new CourseDataSource(db);
@@ -139,6 +138,67 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return super.onOptionsItemSelected(item);
     }
 
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId()==mDrawerList.getId()) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+            for (int i = 0; i<menuItems.length; i++) {
+                menu.add(Menu.NONE, i, i, menuItems[i]);
+            }
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        int menuItemIndex = item.getItemId();
+        final String oldName = student.getCourses().get(info.position-1).getName();
+
+        if (menuItemIndex == 0) {
+            //Edit course name
+            //put an alertdialog with the coursename already filled in
+            AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
+            alertDB.setMessage("Please enter a new name for this course:");
+            final EditText courseNameET = new EditText(this);
+            alertDB.setView(courseNameET);
+            alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    String newName = courseNameET.getText().toString();
+                    //if they didn't change anything, don't change anything
+                    if (newName.equals(oldName)) {
+                        return;
+                    }
+                    else {
+                        //validate the courseName
+                        if (validateCourseName(courseName)) {
+                            //change this course's name in the database
+
+                            //change it in the drawers
+
+                            //change it on the home screen
+
+                            //change it in the student class
+                        }
+                    }
+                }
+            });
+            alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    return;
+                }
+            });
+            showSoftKeyboard(courseNameET);
+//        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
+            AlertDialog alert = alertDB.create();
+            alert.show();
+            courseNameET.requestFocus();
+        }
+
+        TextView text = (TextView)findViewById(R.id.footer);
+        text.setText(String.format("Selected %s for item %s", menuItemName, listItemName));
+        return true;
+    }
     public void promptCourseName(View view) {
         //ask for course name
         AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
@@ -293,6 +353,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 return;
             }
         });
+    }
+
+    private class DrawerItemLongClickListener implements ListView.OnItemLongClickListener {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            showCourseOptions(position);
+            return true;
+        }
+    }
+
+    private void showCourseOptions(int position) {
+
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {

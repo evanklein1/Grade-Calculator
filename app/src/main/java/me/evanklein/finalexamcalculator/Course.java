@@ -2,6 +2,7 @@ package me.evanklein.finalexamcalculator;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Evan on 01/11/2015.
@@ -9,7 +10,7 @@ import java.util.Map;
 public class Course {
 
     private String name;
-    private HashMap<Integer, Assessment> assessments;
+    private TreeMap<Integer, Assessment> assessments;
     private Double desiredGrade;
     private Double currentGrade;
 
@@ -68,11 +69,11 @@ public class Course {
         return worth;
     }
 
-    public HashMap<Integer, Assessment> getAssessments() {
+    public TreeMap<Integer, Assessment> getAssessments() {
         return assessments;
     }
 
-    public void setAssessments(HashMap<Integer, Assessment> assessments) {
+    public void setAssessments(TreeMap<Integer, Assessment> assessments) {
         this.assessments = assessments;
     }
 
@@ -120,7 +121,7 @@ public class Course {
     }
 
     public Course() {
-        assessments = new HashMap<Integer, Assessment>();
+        assessments = new TreeMap<Integer, Assessment>();
         name = "";
     }
 }
