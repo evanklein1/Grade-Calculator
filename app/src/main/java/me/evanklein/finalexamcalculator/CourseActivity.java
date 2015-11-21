@@ -386,6 +386,7 @@ public class CourseActivity extends AppCompatActivity
                     addRow(numRows + 1, new Assessment("", 0.0, false, 0.0));
                     return;
                 }
+                updateTotals();
             }
         });
         alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -417,9 +418,16 @@ public class CourseActivity extends AppCompatActivity
             Double requiredRestMark = course.getRequiredRestMark();
             //change the text of the message at the bottom
             TextView messageTV = (TextView) findViewById(R.id.final_message);
-            messageTV.setText(String.format
-                    ("You need %.1f%% in the rest of the course to get %s%% in this course.",
-                            requiredRestMark, formatDecimal(desiredGrade)));
+            if (requiredRestMark <= 0) {
+                //they already have their desired grade -> tell them
+                messageTV.setText(String.format
+                        ("You already have %s%% in this course. You're good!",
+                                formatDecimal(desiredGrade)));
+            } else {
+                messageTV.setText(String.format
+                        ("You need %.1f%% in the rest of the course to get %s%% in this course.",
+                                requiredRestMark, formatDecimal(desiredGrade)));
+            }
         }
     }
 

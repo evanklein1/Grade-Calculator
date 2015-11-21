@@ -110,13 +110,7 @@ public class Course {
         Double yetToMark;
         Double totalWorth = getTotalWorth();
         Double markedWorth = getMarkedWorth();
-//        if (totalWorth.equals(markedWorth)) {
-//            yetToMark = 100-markedWorth;
-//        }
-//        else {
-//            yetToMark = totalWorth - markedWorth;
-//        }
-        yetToMark = 100 - markedWorth;
+        yetToMark = Math.max(100.0, totalWorth) - markedWorth;
         return ((desiredGrade - (getMarkSoFar() * markedWorth / 100))/yetToMark) * 100;
     }
 
