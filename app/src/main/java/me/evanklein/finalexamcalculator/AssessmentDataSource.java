@@ -30,7 +30,10 @@ public class AssessmentDataSource {
             + COLUMN_MARK_STRING + " text, "
             + COLUMN_MARKED + " boolean, "
             + COLUMN_WORTH + " float, "
-            + "PRIMARY KEY (" + COLUMN_COURSE + "," + COLUMN_ID + "));";
+            + "PRIMARY KEY (" + COLUMN_COURSE + "," + COLUMN_ID + ")" +
+            "FOREIGN KEY (" + COLUMN_COURSE + ") REFERENCES " + CourseDataSource.TABLE_NAME + "(" +
+            CourseDataSource.COLUMN_NAME + ")" +
+            ");";
     public AssessmentDataSource(SQLiteDatabase database) {
         mDatabase = database;
     }
