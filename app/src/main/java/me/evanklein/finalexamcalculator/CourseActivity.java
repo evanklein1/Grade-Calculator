@@ -143,7 +143,7 @@ public class CourseActivity extends AppCompatActivity
             else {
                 //EXISTING COURSE
                 //remove the first default row
-                tableLayout.removeView(tableLayout.findViewById(R.id.table_row_1));
+//                tableLayout.removeView(tableLayout.findViewById(R.id.table_row_1));
                 String[] whereArgs = new String[]{courseName};
                 List<Course> courses = courseDS.read(String.format("%s = ?", CourseDataSource.COLUMN_NAME), whereArgs, null, null, null);
                 //hopefully courses just contains one course
@@ -393,13 +393,6 @@ public class CourseActivity extends AppCompatActivity
             }
         }
     }
-    private void disableEditText(EditText editText) {
-        editText.setFocusable(false);
-        editText.setEnabled(false);
-        editText.setCursorVisible(false);
-        editText.setKeyListener(null);
-        editText.setBackgroundColor(Color.TRANSPARENT);
-    }
 
     public void addRow(final Integer currentRowNum, Assessment a) {
         course.addAssessment(currentRowNum, a);
@@ -430,7 +423,7 @@ public class CourseActivity extends AppCompatActivity
         newYourMark.setTag(yourMarkString);
         newYourMark.setLayoutParams(newYourMarkLayoutParams);
         newYourMark.setInputType(InputType.TYPE_CLASS_NUMBER);
-        newYourMark.setHint("ex: 15/20, or 75");
+        newYourMark.setHint("15/20 or 75");
         newYourMark.setKeyListener(DigitsKeyListener.getInstance("0123456789./"));
         newYourMark.setMinWidth(getSizeInDP(10));
         newYourMark.setMaxWidth(getSizeInDP(10));
@@ -443,7 +436,7 @@ public class CourseActivity extends AppCompatActivity
         String buttonString = "del_button_" + Integer.toString(currentRowNum);
         newDelBtn.setTag(buttonString);
         newDelBtn.setLayoutParams(newDeleteBtnLayoutParams);
-        newDelBtn.setBackgroundResource(R.drawable.delete_button);
+        newDelBtn.setBackgroundColor(Color.TRANSPARENT);
         newDelBtn.setText("X");
         setButtonListener(newDelBtn, currentRowNum);
         setTypeListener(newType, currentRowNum);
