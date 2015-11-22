@@ -66,56 +66,6 @@
                             android:id="@+id/worth_text"
                             android:layout_column="2" />
                     </TableRow>
-                    <TableRow
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:id="@+id/table_row_1"
-                        >
-
-                        <EditText
-                            android:layout_width="fill_parent"
-                            android:minWidth="60dp"
-                            android:maxWidth="60dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:id="@+id/type_1"
-                            android:inputType="text"
-                            android:hint="Test, etc."
-                            android:layout_column="0" />
-
-                        <EditText
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="30dp"
-                            android:minWidth="10dp"
-                            android:maxWidth="10dp"
-                            android:inputType="numberDecimal"
-                            android:layout_weight="1"
-                            android:digits="0123456789./"
-                            android:id="@+id/your_mark_1"
-                            android:layout_column="1" />
-
-                        <EditText
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:minWidth="10dp"
-                            android:maxWidth="10dp"
-                            android:inputType="numberDecimal"
-                            android:layout_weight="1"
-                            android:id="@+id/worth_1"
-                            android:layout_column="2" />
-
-                        <Button
-                            style="?android:attr/buttonStyleSmall"
-                            android:layout_height="30dp"
-                            android:layout_width="30dp"
-                            android:text="X"
-                            android:background="@android:color/transparent"
-                            android:id="@+id/del_btn_1"
-                            android:layout_column="3" />
-
-                    </TableRow>
                 </TableLayout>
                 <TableLayout
                     android:layout_width="match_parent"
