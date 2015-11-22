@@ -231,7 +231,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     return;
                 }
             });
-            showSoftKeyboard(newNameET);
             AlertDialog alert = alertDB.create();
             alert.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
             alert.show();
@@ -321,19 +320,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         stmt.execute();
     }
 
-//    public void updateAssessmentTableOnEdit(String oldName, String newName) {
-//        SQLiteStatement stmtA = db.compileStatement(
-//                "UPDATE " + AssessmentDataSource.TABLE_NAME
-//                        + " SET " + AssessmentDataSource.COLUMN_COURSE + " = ?"
-//                        + " WHERE " + AssessmentDataSource.COLUMN_COURSE + " = ?");
-////        "UPDATE assessment SET name='CSC374' where name='CSC373'"
-//        stmtA.bindString(1, newName);
-//        stmtA.bindString(2, oldName);
-//        stmtA.execute();
-//    }
     public void promptCourseName(View view) {
         //ask for course name
-        Boolean inputValid = true;
         AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
         alertDB.setMessage("Enter the name of the course:");
         final EditText courseNameET = new EditText(this);
@@ -360,9 +348,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 return;
             }
         });
-        showSoftKeyboard(courseNameET);
-//        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
         AlertDialog alert = alertDB.create();
         alert.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alert.show();
@@ -378,6 +363,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     courseET.setError("This course is already in your list of courses! Please enter a different course name.");
                     isValid = false;
                 }
+                else if (courseSTR.equals("")) {
+                    courseET.setError("Please enter a course name.");
+                    isValid = false;
+                }
                 else {
                     isValid = true;
                 }
@@ -388,47 +377,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
     }
-    public boolean validateCourseName(String name) {
-        if (student.getCourseWithName(name)!=null) {
-            //they can't enter this name
-            AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
-            alertDB.setMessage("This course is already in your list of courses. Please enter a different course name.");
-            alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    return;
-                }
-            });
-            AlertDialog alert = alertDB.create();
-            alert.show();
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
-
-    public void showSoftKeyboard(View view) {
-        if (view.requestFocus()) {
-            InputMethodManager imm = (InputMethodManager)
-                    getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-        }
-    }
-    public void editCourse(View view) {
-        TableRow tableRow = (TableRow) view.getParent();
-        TextView courseNameTV = (TextView) tableRow.getChildAt(0);
-        String courseName = courseNameTV.toString();
-        Intent i = new Intent(this, CourseActivity.class);
-        Bundle extras = new Bundle();
-        extras.putString(COURSE_NAME, courseName);
-        extras.putString(NEW_COURSE, FALSE);
-        i.putExtras(extras);
-        startActivity(i);
-    }
 
     public void addDrawerItems() {
         //first add the home button
-
         ArrayList<Course> courses = student.getCourses();
         String[] courseNames = new String[courses.size() + 1];
         courseNames[0] = "Home";
@@ -526,10 +477,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             mDrawerLayout.closeDrawers();
         }
         else {
-            // Create a new fragment and specify the planet to show based on position
             mDrawerList.setItemChecked(position, true);
             Integer index = position;
-            //setTitle(student.getCourses().get(position).getName());
             Intent i = new Intent(this, CourseActivity.class);
             String courseName = student.getCourses().get(index-1).getName();
             Bundle extras = new Bundle();
