@@ -384,13 +384,14 @@ public class CourseActivity extends AppCompatActivity
                 if (student.getCourseWithName(courseSTR) != null) {
                     courseET.setError("This course is already in your list of courses! Please enter a different course name.");
                     isCourseValid = false;
-                }
-                else {
+                } else {
                     isCourseValid = true;
                 }
             }
+
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
+
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
@@ -538,6 +539,10 @@ public class CourseActivity extends AppCompatActivity
         alertDB.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 //delete assessment
+                TableRow thisRow = (TableRow) tableLayout.findViewWithTag("row_" + Integer.toString(currentRowNum));
+                if (thisRow.hasFocus()) {
+                    thisRow.clearFocus();
+                }
                 course.removeAssessment(currentRowNum);
                 rowsLeft--;
                 if (currentRowNum.equals(numRows)) {
@@ -548,6 +553,8 @@ public class CourseActivity extends AppCompatActivity
                 tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(currentRowNum)));
                 //if we removed all the rows, need to add a first one in
                 if (course.getAssessments().size() == 0 || rowsLeft.equals(0)) {
+                    //let's reset numRows
+                    numRows = 0;
                     addRow(numRows + 1, new Assessment("", 0.0, false, 0.0));
                     return;
                 }
@@ -772,15 +779,16 @@ public class CourseActivity extends AppCompatActivity
     }
 
     public void setTouchListener() {
-        findViewById(R.id.main_layout).setOnClickListener(new View.OnClickListener() {
-                                                             public
-                                                          }
-        );
-        findViewById(R.id.main_layout).setOnClickListener();Listener(new View.OnTouchListener() {
+        findViewById(R.id.scroll_view).setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent ev) {
-                hideKeyboard(view);
-                return false;
+            public void onClick(View v) {
+                hideKeyboard(v);
+            }
+        });
+        findViewById(R.id.main_layout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyboard(v);
             }
         });
     };
