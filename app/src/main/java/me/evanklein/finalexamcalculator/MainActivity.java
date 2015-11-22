@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -70,30 +71,47 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         registerForContextMenu(mDrawerList);
 
         mDbHelper = new DBHelper(getApplicationContext());
-        db = mDbHelper.getWritableDatabase();
-        mDataSource = new CourseDataSource(db);
-
-        // Initialize a Loader with id '1'. If the Loader with this id already
-        // exists, then the LoaderManager will reuse the existing Loader.
-        getLoaderManager().initLoader(LOADER_ID, null, this);
-        //initialize a student object, which is a singleton class and represents the student using
-        //the app
-        student = Student.getInstance();
-        //get all the courses from the database
-        List<Course> courses = mDataSource.read();
-        student.setCourses((ArrayList) courses);
-        addDrawerItems();
-        //if courses are empty, want to just print a string telling them to add courses
-        if (courses.size() == 0) {
-            displayNoCoursesMessage();
+        try {
+            db = mDbHelper.getWritableDatabase();
+            mDataSource = new CourseDataSource(db);
+            // Initialize a Loader with id '1'. If the Loader with this id already
+            // exists, then the LoaderManager will reuse the existing Loader.
+            getLoaderManager().initLoader(LOADER_ID, null, this);
+            //initialize a student object, which is a singleton class and represents the student using
+            //the app
+            student = Student.getInstance();
+            //get all the courses from the database
+            List<Course> courses = mDataSource.read();
+            student.setCourses((ArrayList) courses);
+            addDrawerItems();
+            //if courses are empty, want to just print a string telling them to add courses
+            if (courses.size() == 0) {
+                displayNoCoursesMessage();
+            }
+            else {
+                //now we want to iterate through all the assessments and display them in a table layout
+                displayCourses();
+            }
+            setTouchListener();
         }
-        else {
-            //now we want to iterate through all the assessments and display them in a table layout
-            displayCourses();
+        catch (SQLiteException e) {
+            displayErrorMessage();
         }
-        setTouchListener();
+        catch (Exception e) {
+            displayErrorMessage();
+        }
     }
 
+    public void displayErrorMessage() {
+        TableRow tableRow = new TableRow(this);
+        TableRow.LayoutParams params = new TableRow.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT);
+        TableRow.LayoutParams newNameLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+        final TextView noCoursesTV = new TextView(this);
+        noCoursesTV.setLayoutParams(newNameLayoutParams);
+        noCoursesTV.setText("An error occurred and your courses couldn't be loaded. Please try again later.");
+        tableRow.addView(noCoursesTV);
+        tableLayout.addView(tableRow, params);
+    }
 
     public void setTouchListener() {
         findViewById(R.id.main_layout).setOnTouchListener(new View.OnTouchListener() {
@@ -109,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         in.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
-
 
     public void dropAndRecreateTables() {
         String assessmentTable = "DROP TABLE IF EXISTS assessment;";
@@ -146,8 +163,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         db = null;
     }
 
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -174,8 +189,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                     ContextMenu.ContextMenuInfo menuInfo) {
         if (v.getId()==mDrawerList.getId()) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
-            for (int i = 0; i<menuItems.length; i++) {
-                menu.add(Menu.NONE, i, i, menuItems[i]);
+            if (info.position != 0) {
+                //only add the menu items if we're clicking on a course, not "Home"
+                for (int i = 0; i < menuItems.length; i++) {
+                    menu.add(Menu.NONE, i, i, menuItems[i]);
+                }
             }
         }
     }
@@ -471,18 +489,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 return;
             }
         });
-    }
-
-    private class DrawerItemLongClickListener implements ListView.OnItemLongClickListener {
-        @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            showCourseOptions(position);
-            return true;
-        }
-    }
-
-    private void showCourseOptions(int position) {
-
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {

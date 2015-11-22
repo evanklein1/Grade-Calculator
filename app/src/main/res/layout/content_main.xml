@@ -135,6 +135,18 @@
             android:layout_gravity="left"
             android:choiceMode="singleChoice"
             android:background="#ffeeeeee"
-            xmlns:android="http://schemas.android.com/apk/res/android" />
+            xmlns:android="http://schemas.android.com/apk/res/android">
+
+            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:paddingLeft="30dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Course Name"/>
+        </ListView>
+
     </android.support.v4.widget.DrawerLayout>
 </FrameLayout>

@@ -53,7 +53,7 @@
                             android:layout_gravity="center"
                             android:layout_weight="1"
                             android:textAppearance="?android:attr/textAppearanceMedium"
-                            android:text="Your Mark"
+                            android:text="Your Mark (15/20 or 75)"
                             android:id="@+id/your_mark_text"
                             android:layout_column="1" />
 

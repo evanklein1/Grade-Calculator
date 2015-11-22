@@ -326,6 +326,12 @@ public class CourseActivity extends AppCompatActivity
 //        "UPDATE course SET name='CSC374' where name='CSC373'"
         stmt.bindString(1, toDeleteName);
         stmt.execute();
+        SQLiteStatement stmt2 = db.compileStatement(
+                "DELETE FROM " + AssessmentDataSource.TABLE_NAME
+                        + " WHERE " + AssessmentDataSource.COLUMN_COURSE + " = ?");
+//        "UPDATE course SET name='CSC374' where name='CSC373'"
+        stmt.bindString(1, toDeleteName);
+        stmt.execute();
         //change it in the drawers
         addDrawerItems();
     }
@@ -342,6 +348,15 @@ public class CourseActivity extends AppCompatActivity
                 "UPDATE " + CourseDataSource.TABLE_NAME
                         + " SET " + CourseDataSource.COLUMN_NAME + " = ?"
                         + " WHERE " + CourseDataSource.COLUMN_NAME + " = ?");
+//        "UPDATE course SET name='CSC374' where name='CSC373'"
+        stmt.bindString(1, newName);
+        stmt.bindString(2, oldName);
+        stmt.execute();
+
+        SQLiteStatement stmt2 = db.compileStatement(
+                "UPDATE " + AssessmentDataSource.TABLE_NAME
+                        + " SET " + AssessmentDataSource.COLUMN_COURSE + " = ?"
+                        + " WHERE " + AssessmentDataSource.COLUMN_COURSE + " = ?");
 //        "UPDATE course SET name='CSC374' where name='CSC373'"
         stmt.bindString(1, newName);
         stmt.bindString(2, oldName);
@@ -401,7 +416,9 @@ public class CourseActivity extends AppCompatActivity
         TableRow.LayoutParams newTypeLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
         TableRow.LayoutParams newYourMarkLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
         TableRow.LayoutParams newWorthLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
-        TableRow.LayoutParams newDeleteBtnLayoutParams = new TableRow.LayoutParams(getSizeInDP(30), getSizeInDP(30));
+        TableRow.LayoutParams newDeleteBtnLayoutParams = new TableRow.LayoutParams();
+        newDeleteBtnLayoutParams.height = getSizeInDP(40);
+        newDeleteBtnLayoutParams.width  = getSizeInDP(40);
         newTypeLayoutParams.column = 0;
         newYourMarkLayoutParams.column = 1;
         newWorthLayoutParams.column = 2;
