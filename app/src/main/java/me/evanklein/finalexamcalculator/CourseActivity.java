@@ -268,7 +268,7 @@ public class CourseActivity extends AppCompatActivity
 //                    } else {
                     //validate the courseName
                     if (isCourseValid) {
-                        editCourseName(oldName, newName, info.position);
+                        editCourseName(oldName, newName);
                     }
 //                    }
                 }
@@ -326,16 +326,19 @@ public class CourseActivity extends AppCompatActivity
 //        "UPDATE course SET name='CSC374' where name='CSC373'"
         stmt.bindString(1, toDeleteName);
         stmt.execute();
-        SQLiteStatement stmt2 = db.compileStatement(
+        deleteAssessmentsForCourse(toDeleteName);
+        //change it in the drawers
+        addDrawerItems();
+    }
+    public void deleteAssessmentsForCourse(String toDeleteName) {
+        SQLiteStatement stmt = db.compileStatement(
                 "DELETE FROM " + AssessmentDataSource.TABLE_NAME
                         + " WHERE " + AssessmentDataSource.COLUMN_COURSE + " = ?");
 //        "UPDATE course SET name='CSC374' where name='CSC373'"
         stmt.bindString(1, toDeleteName);
         stmt.execute();
-        //change it in the drawers
-        addDrawerItems();
     }
-    public void editCourseName(String oldName, String newName, Integer index) {
+    public void editCourseName(String oldName, String newName) {
         if (oldName.equals(course.getName())) {
             //if we're editing the course we're currently in, just change the title
             getSupportActionBar().setTitle(newName);
@@ -352,8 +355,14 @@ public class CourseActivity extends AppCompatActivity
         stmt.bindString(1, newName);
         stmt.bindString(2, oldName);
         stmt.execute();
-
-        SQLiteStatement stmt2 = db.compileStatement(
+        editAssessmentsForCourse(oldName, newName);
+        //also need to update the assessment table
+        //updateAssessmentTableOnEdit(oldName, newName);
+        //change it in the drawers
+        addDrawerItems();
+    }
+    public void editAssessmentsForCourse(String oldName, String newName) {
+        SQLiteStatement stmt = db.compileStatement(
                 "UPDATE " + AssessmentDataSource.TABLE_NAME
                         + " SET " + AssessmentDataSource.COLUMN_COURSE + " = ?"
                         + " WHERE " + AssessmentDataSource.COLUMN_COURSE + " = ?");
@@ -361,10 +370,6 @@ public class CourseActivity extends AppCompatActivity
         stmt.bindString(1, newName);
         stmt.bindString(2, oldName);
         stmt.execute();
-        //also need to update the assessment table
-        //updateAssessmentTableOnEdit(oldName, newName);
-        //change it in the drawers
-        addDrawerItems();
     }
 
     public void addNewCourseNameListener(final EditText courseET) {

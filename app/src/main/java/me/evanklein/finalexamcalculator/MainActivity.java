@@ -275,10 +275,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 //        "UPDATE course SET name='CSC374' where name='CSC373'"
         stmt.bindString(1, toDeleteName);
         stmt.execute();
+        //delete the assessments
+        deleteAssessmentsForCourse(toDeleteName);
         //change it in the drawers
         addDrawerItems();
         //change it on the home screen
         tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(index)));
+    }
+    public void deleteAssessmentsForCourse(String toDeleteName) {
+        SQLiteStatement stmt = db.compileStatement(
+                "DELETE FROM " + AssessmentDataSource.TABLE_NAME
+                        + " WHERE " + AssessmentDataSource.COLUMN_COURSE + " = ?");
+//        "UPDATE course SET name='CSC374' where name='CSC373'"
+        stmt.bindString(1, toDeleteName);
+        stmt.execute();
     }
     public void editCourseName(String oldName, String newName, Integer index) {
         //change it in the student class
@@ -293,12 +303,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         stmt.bindString(2, oldName);
         stmt.execute();
         //also need to update the assessment table
-        //updateAssessmentTableOnEdit(oldName, newName);
+        editAssessmentsForCourse(oldName, newName);
         //change it in the drawers
         addDrawerItems();
         //change it on the home screen
         TextView courseNameET = (TextView) tableLayout.findViewWithTag("name_" + Integer.toString(index));
         courseNameET.setText(newName);
+    }
+    public void editAssessmentsForCourse(String oldName, String newName) {
+        SQLiteStatement stmt = db.compileStatement(
+                "UPDATE " + AssessmentDataSource.TABLE_NAME
+                        + " SET " + AssessmentDataSource.COLUMN_COURSE + " = ?"
+                        + " WHERE " + AssessmentDataSource.COLUMN_COURSE + " = ?");
+//        "UPDATE course SET name='CSC374' where name='CSC373'"
+        stmt.bindString(1, newName);
+        stmt.bindString(2, oldName);
+        stmt.execute();
     }
 
 //    public void updateAssessmentTableOnEdit(String oldName, String newName) {
