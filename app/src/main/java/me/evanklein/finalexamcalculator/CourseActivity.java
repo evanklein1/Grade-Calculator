@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class CourseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<List<Assessment>> {
@@ -57,7 +58,6 @@ public class CourseActivity extends AppCompatActivity
     private CourseDataSource courseDS;
     private DBHelper mDbHelper;
     private Integer numRows = 0;
-    private Integer rowsLeft = 0;
     private Course course;
     private TableLayout tableLayout;
     private DrawerLayout mDrawerLayout;
@@ -68,6 +68,7 @@ public class CourseActivity extends AppCompatActivity
     private EditText desiredGradeET;
     private HashMap<Integer, String> fractionMarks = new HashMap<Integer, String>();
     private static boolean isCourseValid = true;
+    private boolean silenceListener = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -484,7 +485,6 @@ public class CourseActivity extends AppCompatActivity
         tableRow.addView(newDelBtn);
         tableLayout.addView(tableRow, params);
         numRows++;
-        rowsLeft++;
     }
 
     public int getSizeInDP(Integer size) {
@@ -508,7 +508,6 @@ public class CourseActivity extends AppCompatActivity
             tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(numRows)));
             course.removeAssessment(numRows);
             numRows--;
-            rowsLeft--;
         }
     }
 
@@ -541,24 +540,22 @@ public class CourseActivity extends AppCompatActivity
                 //delete assessment
                 TableRow thisRow = (TableRow) tableLayout.findViewWithTag("row_" + Integer.toString(currentRowNum));
                 if (thisRow.hasFocus()) {
-                    thisRow.clearFocus();
+                    //use a silencer before we kill it
+                    silenceListener = true;
+                    //findViewById(R.id.scroll_view).requestFocus();
                 }
                 course.removeAssessment(currentRowNum);
-                rowsLeft--;
-                if (currentRowNum.equals(numRows)) {
-                    //if we are deleting the last row, decrease the number of rows
-                    numRows -= 1;
-                }
+                decrementKeys(currentRowNum);
                 //delete row
                 tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(currentRowNum)));
                 //if we removed all the rows, need to add a first one in
-                if (course.getAssessments().size() == 0 || rowsLeft.equals(0)) {
+                if (course.getAssessments().size() == 0) {
                     //let's reset numRows
-                    numRows = 0;
                     addRow(numRows + 1, new Assessment("", 0.0, false, 0.0));
                     return;
                 }
                 updateTotals();
+                silenceListener = false;
             }
         });
         alertDB.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -568,6 +565,15 @@ public class CourseActivity extends AppCompatActivity
         });
         AlertDialog alert = alertDB.create();
         alert.show();
+    }
+
+    public void decrementKeys(Integer deletedRowNum) {
+        TreeMap<Integer, Assessment> a = course.getAssessments();
+        for (int i = deletedRowNum; i < numRows; i++) {
+            a.put(i, a.get(i+1));
+        }
+        //remove the last element in the map
+        a.remove(numRows);
     }
     public void setDesiredGradeListener() {
         desiredGradeET.addTextChangedListener(new TextWatcher() {
@@ -609,20 +615,22 @@ public class CourseActivity extends AppCompatActivity
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 //if we just exited the type field
-                if (!hasFocus) {
-                    //change the assessment object
-                    course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0)).setType(typeET.getText().toString());
-                } else {
-                    //we have entered focus: if the number of existing rows in the activity is
-                    //more than current rowNum, don't do anything.
-                    if (numRows.equals(currentRowNum)) {
-                        //else, create a new row (INFLATE activity)
-                        addRow(currentRowNum + 1, new Assessment("", 0.0, false, 0.0));
+                if (!silenceListener) {
+                    if (!hasFocus) {
+                        //change the assessment object
+                        course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0)).setType(typeET.getText().toString());
+                    } else {
+                        //we have entered focus: if the number of existing rows in the activity is
+                        //more than current rowNum, don't do anything.
+                        if (numRows.equals(currentRowNum)) {
+                            //else, create a new row (INFLATE activity)
+                            addRow(currentRowNum + 1, new Assessment("", 0.0, false, 0.0));
+                        }
+                        removeExtraRows(currentRowNum, tableLayout);
                     }
-                    removeExtraRows(currentRowNum, tableLayout);
+                    calculateRequiredMark();
+                    updateTotals();
                 }
-                calculateRequiredMark();
-                updateTotals();
             }
         });
     }
