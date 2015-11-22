@@ -331,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onClick(DialogInterface dialog, int whichButton) {
                 String courseName = courseNameET.getText().toString();
                 //validate the courseName
-                if (isValid) {
+                if (!courseName.equals("") && isValid) {
                     Intent i = new Intent(MainActivity.this, CourseActivity.class);
                     //THIS IS A NEW COURSE
                     Bundle extras = new Bundle();

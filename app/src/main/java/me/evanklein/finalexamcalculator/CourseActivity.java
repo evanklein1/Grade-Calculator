@@ -57,6 +57,7 @@ public class CourseActivity extends AppCompatActivity
     private CourseDataSource courseDS;
     private DBHelper mDbHelper;
     private Integer numRows = 0;
+    private Integer rowsLeft = 0;
     private Course course;
     private TableLayout tableLayout;
     private DrawerLayout mDrawerLayout;
@@ -156,7 +157,9 @@ public class CourseActivity extends AppCompatActivity
                 newCourse = false;
                 // display the desired grade
                 //get the desired grade from the database
-                desiredGradeET.setText(formatDecimal(course.getDesiredGrade()));
+                if (!course.getDesiredGrade().equals(0.0)) {
+                    desiredGradeET.setText(formatDecimal(course.getDesiredGrade()));
+                }
             }
             displayAssessments(assessments);
             updateTotals();
@@ -445,7 +448,6 @@ public class CourseActivity extends AppCompatActivity
         newYourMark.setTag(yourMarkString);
         newYourMark.setLayoutParams(newYourMarkLayoutParams);
         newYourMark.setInputType(InputType.TYPE_CLASS_NUMBER);
-        newYourMark.setHint("15/20 or 75");
         newYourMark.setKeyListener(DigitsKeyListener.getInstance("0123456789./"));
         newYourMark.setMinWidth(getSizeInDP(10));
         newYourMark.setMaxWidth(getSizeInDP(10));
@@ -480,7 +482,8 @@ public class CourseActivity extends AppCompatActivity
         tableRow.addView(newWorth);
         tableRow.addView(newDelBtn);
         tableLayout.addView(tableRow, params);
-        numRows += 1;
+        numRows++;
+        rowsLeft++;
     }
 
     public int getSizeInDP(Integer size) {
@@ -503,7 +506,8 @@ public class CourseActivity extends AppCompatActivity
                 && (numRows - 1 > currentRowNum)) {
             tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(numRows)));
             course.removeAssessment(numRows);
-            numRows -= 1;
+            numRows--;
+            rowsLeft--;
         }
     }
 
@@ -535,6 +539,7 @@ public class CourseActivity extends AppCompatActivity
             public void onClick(DialogInterface dialog, int whichButton) {
                 //delete assessment
                 course.removeAssessment(currentRowNum);
+                rowsLeft--;
                 if (currentRowNum.equals(numRows)) {
                     //if we are deleting the last row, decrease the number of rows
                     numRows -= 1;
@@ -542,7 +547,7 @@ public class CourseActivity extends AppCompatActivity
                 //delete row
                 tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(currentRowNum)));
                 //if we removed all the rows, need to add a first one in
-                if (course.getAssessments().size() == 0) {
+                if (course.getAssessments().size() == 0 || rowsLeft.equals(0)) {
                     addRow(numRows + 1, new Assessment("", 0.0, false, 0.0));
                     return;
                 }
@@ -767,7 +772,11 @@ public class CourseActivity extends AppCompatActivity
     }
 
     public void setTouchListener() {
-        findViewById(R.id.main_layout).setOnTouchListener(new View.OnTouchListener() {
+        findViewById(R.id.main_layout).setOnClickListener(new View.OnClickListener() {
+                                                             public
+                                                          }
+        );
+        findViewById(R.id.main_layout).setOnClickListener();Listener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent ev) {
                 hideKeyboard(view);
