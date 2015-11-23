@@ -592,12 +592,12 @@ public class CourseActivity extends AppCompatActivity
     }
     public void calculateRequiredMark() {
         String desiredGradeSTR = desiredGradeET.getText().toString();
+        TextView messageTV = (TextView) findViewById(R.id.final_message);
         if (!("".equals(desiredGradeSTR))) {
             Double desiredGrade = Double.valueOf(desiredGradeET.getText().toString());
             course.setDesiredGrade(desiredGrade);
             Double requiredRestMark = course.getRequiredRestMark();
             //change the text of the message at the bottom
-            TextView messageTV = (TextView) findViewById(R.id.final_message);
             if (requiredRestMark <= 0) {
                 //they already have their desired grade -> tell them
                 messageTV.setText(String.format
@@ -608,6 +608,10 @@ public class CourseActivity extends AppCompatActivity
                         ("You need %.1f%% in the rest of the course to get %s%% in this course.",
                                 requiredRestMark, formatDecimal(desiredGrade)));
             }
+        }
+        else {
+            messageTV.setText("");
+            course.setDesiredGrade(0.0);
         }
     }
 
