@@ -76,6 +76,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mDbHelper = new DBHelper(getApplicationContext());
         try {
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle("Home");
+            }
             db = mDbHelper.getWritableDatabase();
             mDataSource = new CourseDataSource(db);
             // Initialize a Loader with id '1'. If the Loader with this id already
@@ -447,7 +450,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setButtonListener(newButton, currentRowNum);
             //we want to fill in the values of the edit texts and then disable them
         newName.setText(c.getName());
-        newDG.setText(formatDecimal(c.getCurrentGrade()));
+        newDG.setText(formatDecimal(c.getCurrentGrade()) + " %");
         newButton.setText("View");
         tableRow.addView(newName);
         tableRow.addView(newDG);

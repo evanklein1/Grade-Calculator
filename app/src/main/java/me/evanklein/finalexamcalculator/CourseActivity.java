@@ -605,7 +605,7 @@ public class CourseActivity extends AppCompatActivity
                                 formatDecimal(desiredGrade)));
             } else {
                 messageTV.setText(String.format
-                        ("You need %.1f%% in the rest of the course to get %s%% in this course.",
+                        ("You need %.1f%% in the rest of the course to get %s%% in this course. Good luck!",
                                 requiredRestMark, formatDecimal(desiredGrade)));
             }
         }
