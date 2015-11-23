@@ -9,12 +9,14 @@ import android.content.Loader;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.MotionEvent;
@@ -31,6 +33,8 @@ import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 displayCourses();
             }
             setTouchListener();
+            updateTotals();
         }
         catch (SQLiteException e) {
             displayErrorMessage();
@@ -249,6 +254,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         alertDB.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 deleteCourse(courseToDelete, currentRowNum);
+                updateTotals();
                 //if we removed all the rows, need to add a first one in
                 if (student.getCourses().size() == 0) {
                     displayNoCoursesMessage();
@@ -325,6 +331,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
         alertDB.setMessage("Enter the name of the course:");
         final EditText courseNameET = new EditText(this);
+        courseNameET.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
         addNewCourseNameListener(courseNameET);
         alertDB.setView(courseNameET);
         alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -420,7 +427,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         newButtonLayoutParams.column = 2;
         final TextView newName = new TextView(this);
         final TextView newDG = new TextView(this);
-        final Button newButton = new Button(this);
+        final Button newButton = new Button(this, null, android.R.attr.buttonStyleSmall);
         String rowTag = "row_" + Integer.toString(currentRowNum);
         tableRow.setTag(rowTag);
         //set tag and layout params for name
@@ -428,6 +435,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         newName.setTag(nameString);
         newName.setLayoutParams(newNameLayoutParams);
         newName.setTextSize(20);
+        newName.setTypeface(null, Typeface.BOLD);
         String dgString = "current_grade_" + Integer.toString(currentRowNum);
         newDG.setTag(dgString);
         newDG.setLayoutParams(newDGLayoutParams);
@@ -436,10 +444,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         newButton.setTag(buttonString);
         newButton.setLayoutParams(newButtonLayoutParams);
         //set onclick listener for button
-        setButtonListener(newButton, c.getName());
+        setButtonListener(newButton, currentRowNum);
             //we want to fill in the values of the edit texts and then disable them
         newName.setText(c.getName());
-        //newDG.setText(c.getCurrentGrade().toString());
+        newDG.setText(formatDecimal(c.getCurrentGrade()));
         newButton.setText("View");
         tableRow.addView(newName);
         tableRow.addView(newDG);
@@ -447,10 +455,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         tableLayout.addView(tableRow, params);
     }
 
-    public void setButtonListener(final Button button, final String courseName) {
+    public void setButtonListener(final Button button, final Integer currentRowNum) {
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
+                //get the text of the course name that's right beside it
+                String courseName = ((TextView)tableLayout.findViewWithTag("name_" + Integer.toString(currentRowNum))).getText().toString();
                 Intent i = new Intent(MainActivity.this, CourseActivity.class);
                 Bundle extras = new Bundle();
                 extras.putString(COURSE_NAME, courseName);
@@ -495,5 +505,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void setTitle(CharSequence title) {
         CharSequence mTitle = title;
         getActionBar().setTitle(mTitle);
+    }
+
+    public String formatDecimal(Double d) {
+        String s = d.toString();
+        DecimalFormat decimalFormat = new DecimalFormat("0.##");
+        String result = decimalFormat.format(Double.valueOf(s));
+        return result;
+    }
+
+    public void updateTotals() {
+        TextView averageTV = (TextView)findViewById(R.id.average);
+        Double average = student.getCurrentAverage();
+        averageTV.setText(String.format("%s %%", formatDecimal(average)));
     }
 }

@@ -78,7 +78,7 @@ public class CourseDataSource {
         return courses;
     }
     public String[] getAllColumns() {
-        return new String[] { COLUMN_NAME, COLUMN_DESIRED_GRADE };
+        return new String[] { COLUMN_NAME, COLUMN_CURRENT_GRADE, COLUMN_DESIRED_GRADE };
     }
     public Course generateObjectFromCursor(Cursor cursor) {
         if (cursor == null) {
@@ -87,7 +87,7 @@ public class CourseDataSource {
         Course course = new Course();
         course.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)));
         course.setDesiredGrade(cursor.getDouble(cursor.getColumnIndex(COLUMN_DESIRED_GRADE)));
-        course.setCurrentGrade(cursor.getDouble(cursor.getColumnIndex(COLUMN_DESIRED_GRADE)));
+        course.setCurrentGrade(cursor.getDouble(cursor.getColumnIndex(COLUMN_CURRENT_GRADE)));
         return course;
     }
     public ContentValues generateContentValuesFromObject(Course entity) {
@@ -97,8 +97,8 @@ public class CourseDataSource {
         ContentValues courseValues = new ContentValues();
         //add the course "COURSE NAME" and "DESIRED GRADE" to the course table
         courseValues.put(COLUMN_NAME, entity.getName());
-        courseValues.put(COLUMN_DESIRED_GRADE, entity.getDesiredGrade());
         courseValues.put(COLUMN_CURRENT_GRADE, entity.getMarkSoFar());
+        courseValues.put(COLUMN_DESIRED_GRADE, entity.getDesiredGrade());
         return courseValues;
     }
 }

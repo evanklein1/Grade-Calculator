@@ -69,4 +69,20 @@ public class Student {
     public void setDesiredAverage(double desiredAverage) {
         this.desiredAverage = desiredAverage;
     }
+
+    public Double getCurrentAverage() {
+        Double sum = 0.0;
+        Integer count = 0;
+        for (Course c : courses) {
+            sum += c.getCurrentGrade();
+            count++;
+        }
+        if (count.equals(0)) {
+            return 0.0;
+        }
+        else {
+            return sum / count;
+        }
+
+    }
 }

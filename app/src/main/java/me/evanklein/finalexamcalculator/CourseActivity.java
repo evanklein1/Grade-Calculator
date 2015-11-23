@@ -289,7 +289,8 @@ public class CourseActivity extends AppCompatActivity
         }
         else {//menu item index is 1 -> delete course
             Boolean deleteActiveCourse = false;
-            if (info.position == (student.getCourses().indexOf(course)+1)) {
+            Integer courseIndex = student.getCourses().indexOf(student.getCourseWithName(course.getName()))+1;
+            if (courseIndex.equals(info.position)) {
                 deleteActiveCourse = true;
             }
             areYouSureCourse(oldName, deleteActiveCourse);
@@ -444,7 +445,7 @@ public class CourseActivity extends AppCompatActivity
         newType.setHint("Test, etc.");
         newType.setMinWidth(getSizeInDP(60));
         newType.setMaxWidth(getSizeInDP(60));
-        newType.setInputType(InputType.TYPE_CLASS_TEXT);
+        newType.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         String yourMarkString = "your_mark_" + Integer.toString(currentRowNum);
         newYourMark.setTag(yourMarkString);
         newYourMark.setLayoutParams(newYourMarkLayoutParams);
@@ -503,12 +504,19 @@ public class CourseActivity extends AppCompatActivity
 
     public void removeExtraRows(Integer currentRowNum, TableLayout tableLayout) {
         //remove all empty rows > max(currentRowNum + 1, non-empty row)
-        while (course.getAssessment(numRows-1) != null && course.getAssessment(numRows-1).isEmpty()
-                && (numRows - 1 > currentRowNum)) {
-            tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(numRows)));
-            course.removeAssessment(numRows);
-            numRows--;
-            rowsLeft--;
+        for (int i = numRows; i > currentRowNum + 1; i--) {
+            if (course.getAssessment(i-1) == null) {
+                continue;
+            }
+            else if (course.getAssessment(i-1).isEmpty()) {
+                tableLayout.removeView(tableLayout.findViewWithTag("row_" + Integer.toString(numRows)));
+                course.removeAssessment(numRows);
+                numRows = Math.min(i, numRows-1);
+                rowsLeft--;
+            }
+            else {
+                break;
+            }
         }
     }
 
