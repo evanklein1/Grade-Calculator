@@ -53,37 +53,37 @@
                     android:id="@+id/table_home">
 
                     <!--<TableRow-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="match_parent">-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent">-->
 
-                        <!--<TextView-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:layout_weight="1"-->
-                            <!--android:id="@+id/course_name_1"-->
-                            <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
-                            <!--android:layout_gravity="center"-->
-                            <!--android:text="CSC373"-->
-                            <!--android:layout_column="0" />-->
+                    <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:id="@+id/course_name_1"-->
+                    <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+                    <!--android:layout_gravity="center"-->
+                    <!--android:text="CSC373"-->
+                    <!--android:layout_column="0" />-->
 
-                        <!--<TextView-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:layout_weight="1"-->
-                            <!--android:layout_gravity="center"-->
-                            <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
-                            <!--android:text="50"-->
-                            <!--android:id="@+id/course_grade_1"-->
-                            <!--android:layout_column="1" />-->
+                    <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:layout_gravity="center"-->
+                    <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+                    <!--android:text="50"-->
+                    <!--android:id="@+id/course_grade_1"-->
+                    <!--android:layout_column="1" />-->
 
-                        <!--<Button-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:text="Edit"-->
-                            <!--android:id="@+id/edit_course_1"-->
-                            <!--android:onClick="editCourse"-->
-                            <!--android:layout_column="2"-->
-                            <!--android:layout_gravity="center" />-->
+                    <!--<Button-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="Edit"-->
+                    <!--android:id="@+id/edit_course_1"-->
+                    <!--android:onClick="editCourse"-->
+                    <!--android:layout_column="2"-->
+                    <!--android:layout_gravity="center" />-->
                     <!--</TableRow>-->
                 </TableLayout>
                 <TableLayout
@@ -127,7 +127,7 @@
                     android:layout_height="wrap_content"
                     android:text="Add A Course"
                     android:id="@+id/save_course_button"
-                    android:onClick="promptCourseName"
+                    android:onClick="launchAddCourse"
                     android:layout_gravity="center_horizontal" />
 
             </LinearLayout>

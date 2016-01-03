@@ -10,3 +10,9 @@ For the future:
 duplicate button -> ask them how many and autoincrement the numbers
 course weight (i.e. yearlong vs halfyear)
 cGPA calculate
+
+
+checkbox for if they want their school to be saved
+school suggestions -> need to find some API for the list
+handling case sensitivity for the school name
+
