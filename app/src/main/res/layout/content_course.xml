@@ -73,7 +73,7 @@
                 <TableLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginBottom="10dp"
                     android:id="@+id/total_row">
 
                     <TableRow
@@ -113,6 +113,15 @@
 
                     </TableRow>
                 </TableLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text=""
+                    android:layout_marginBottom="10dp"
+                    android:id="@+id/perc_marked" />
+
                 <TableLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -156,7 +165,7 @@
                     android:layout_height="wrap_content"
                     android:text="Save Course"
                     android:id="@+id/save_course_button"
-                    android:onClick="saveCourse"
+                    android:onClick="saveCourseButton"
                     android:layout_gravity="center_horizontal" />
 
             </LinearLayout>

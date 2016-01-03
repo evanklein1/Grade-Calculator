@@ -10,6 +10,15 @@ import java.util.HashMap;
 public class Student {
     private ArrayList<Course> courses;
     private double desiredAverage;
+    private String school;
+
+    public String getSchool() {
+        return school;
+    }
+
+    public void setSchool(String school) {
+        this.school = school;
+    }
 
     public ArrayList<Course> getCourses() {
         return courses;
@@ -22,6 +31,15 @@ public class Student {
             }
         }
         return null;
+    }
+
+    public int getCourseIndex(String name) {
+        for (int i=0; i < courses.size(); i++) {
+            if (name.equals(courses.get(i).getName())) {
+                return i;
+            }
+        }
+        return -1;
     }
     public void changeCourse(String oldName, String newName) {
         for (Course c: courses) {

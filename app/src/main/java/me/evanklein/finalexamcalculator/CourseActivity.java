@@ -1,6 +1,5 @@
 package me.evanklein.finalexamcalculator;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
@@ -18,7 +17,6 @@ import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.util.TypedValue;
 import android.view.ContextMenu;
-import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -68,6 +66,7 @@ public class CourseActivity extends AppCompatActivity
     private EditText desiredGradeET;
     private HashMap<Integer, String> fractionMarks = new HashMap<Integer, String>();
     private static boolean isCourseValid = true;
+    private static Boolean changed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,6 +166,11 @@ public class CourseActivity extends AppCompatActivity
         setTouchListener();
         //set sidebar items
         addDrawerItems();
+        //hide the keyboard if not new course
+        if (!(newCourse)) {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        }
+        changed = false;
     }
 
     @Override
@@ -202,7 +206,25 @@ public class CourseActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            saveAndStart(new Intent(CourseActivity.this, MainActivity.class));
+//            AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
+//            alertDB.setMessage("Do you want to save the changes you made to " + course.getName() + "?");
+//            alertDB.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int whichButton) {
+//                    if (saveCourse()) {
+//                        //finish();
+//                        startActivity(new Intent(CourseActivity.this, MainActivity.class));
+//                    }
+//                }
+//            });
+//            alertDB.setNegativeButton("Don't Save", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int which) {
+//                    finish();
+//                }
+//            });
+//            AlertDialog alert = alertDB.create();
+//            alert.show();
+////            startActivity(new Intent(CourseActivity.this, MainActivity.class));
         }
     }
 
@@ -308,6 +330,7 @@ public class CourseActivity extends AppCompatActivity
                 if (delActvCourse) {
                     //go home
                     startActivity(new Intent(CourseActivity.this, MainActivity.class));
+                    finish();
                 }
 
             }
@@ -320,6 +343,14 @@ public class CourseActivity extends AppCompatActivity
         AlertDialog alert = alertDB.create();
         alert.show();
     }
+
+    public void hideSoftKeyboard() {
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
     public void deleteCourse(String toDeleteName) {
         //change it in the student class
         student.removeCourseWithName(toDeleteName);
@@ -449,13 +480,14 @@ public class CourseActivity extends AppCompatActivity
         String yourMarkString = "your_mark_" + Integer.toString(currentRowNum);
         newYourMark.setTag(yourMarkString);
         newYourMark.setLayoutParams(newYourMarkLayoutParams);
-        newYourMark.setInputType(InputType.TYPE_CLASS_NUMBER);
         newYourMark.setKeyListener(DigitsKeyListener.getInstance("0123456789./"));
+        newYourMark.setInputType(InputType.TYPE_CLASS_TEXT);
         newYourMark.setMinWidth(getSizeInDP(10));
         newYourMark.setMaxWidth(getSizeInDP(10));
         String worthString = "worth_" + Integer.toString(currentRowNum);
         newWorth.setTag(worthString);
         newWorth.setLayoutParams(newWorthLayoutParams);
+
         newWorth.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         newWorth.setMinWidth(getSizeInDP(10));
         newWorth.setMaxWidth(getSizeInDP(10));
@@ -474,7 +506,12 @@ public class CourseActivity extends AppCompatActivity
             if (a.isMarked()) {
                 newYourMark.setText(formatDecimal(a.getMark()));
             }
-            newWorth.setText(formatDecimal(a.getWorth()));
+            if (a.getWorth().equals(0.0)) {
+                newWorth.setText("");
+            }
+            else {
+                newWorth.setText(formatDecimal(a.getWorth()));
+            }
 //            disableEditText(newType);
 //            disableEditText(newYourMark);
 //            disableEditText(newWorth);
@@ -488,6 +525,7 @@ public class CourseActivity extends AppCompatActivity
         rowsLeft++;
     }
 
+
     public int getSizeInDP(Integer size) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, size, getResources().getDisplayMetrics());
     }
@@ -495,10 +533,13 @@ public class CourseActivity extends AppCompatActivity
     public void updateTotals() {
         TextView mark_so_far = (TextView)findViewById(R.id.mark_so_far);
         TextView worth_so_far = (TextView)findViewById(R.id.total_worth);
+        TextView percentage_marked = (TextView)findViewById(R.id.perc_marked);
         Double worth = course.getTotalWorth();
         Double mark = course.getMarkSoFar();
+        Double perc_marked = course.getMarkedWorth();
         worth_so_far.setText(String.format("%s %%", formatDecimal(worth)));
         mark_so_far.setText(String.format("%.1f %%", mark));
+        percentage_marked.setText(String.format("Percentage Marked: %s %%", formatDecimal(perc_marked)));
         calculateRequiredMark();
     }
 
@@ -525,8 +566,9 @@ public class CourseActivity extends AppCompatActivity
             public void onClick(View v) {
                 // Perform action on click
                 //ask if they're sure
-
-                areYouSure(course.getAssessment(currentRowNum).getType(), currentRowNum);
+                if (!rowsLeft.equals(1)) {
+                    areYouSure(course.getAssessment(currentRowNum).getType(), currentRowNum);
+                }
 
                 //delete assessment and row
 
@@ -547,6 +589,7 @@ public class CourseActivity extends AppCompatActivity
         alertDB.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 //delete assessment
+                changed = true;
                 TableRow thisRow = (TableRow) tableLayout.findViewWithTag("row_" + Integer.toString(currentRowNum));
                 if (thisRow.hasFocus()) {
                     thisRow.clearFocus();
@@ -580,6 +623,7 @@ public class CourseActivity extends AppCompatActivity
     public void setDesiredGradeListener() {
         desiredGradeET.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
+                changed = true;
                 updateTotals();
             }
 
@@ -598,12 +642,26 @@ public class CourseActivity extends AppCompatActivity
             course.setDesiredGrade(desiredGrade);
             Double requiredRestMark = course.getRequiredRestMark();
             //change the text of the message at the bottom
-            if (requiredRestMark <= 0) {
+            if (course.getMarkedWorth() >= 100) {
+                //if all of their assessments have been marked
+                if (course.getCurrentGrade() >= course.getDesiredGrade()) {
+                    messageTV.setText(String.format("You got %s%% in this course. Congratulations!",
+                            formatDecimal(course.getCurrentGrade())));
+                }
+                else {
+                    messageTV.setText(String.format("You got %s%% in this course.",
+                            formatDecimal(course.getCurrentGrade())));
+                }
+
+            }
+            else if (requiredRestMark <= 0) {
                 //they already have their desired grade -> tell them
                 messageTV.setText(String.format
                         ("You already have %s%% in this course. You're good!",
                                 formatDecimal(desiredGrade)));
-            } else {
+            }
+
+            else {
                 messageTV.setText(String.format
                         ("You need %.1f%% in the rest of the course to get %s%% in this course. Good luck!",
                                 requiredRestMark, formatDecimal(desiredGrade)));
@@ -637,6 +695,17 @@ public class CourseActivity extends AppCompatActivity
                 updateTotals();
             }
         });
+        typeET.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+                changed = true;
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
     }
 
     public void setMarkListener(final EditText markET, Integer rowNum) {
@@ -647,12 +716,16 @@ public class CourseActivity extends AppCompatActivity
                 //if we just exited the type field
                 if (!hasFocus) {
                     String markSTR = markET.getText().toString();
+                    Assessment currentA = course.getAssessment(currentRowNum);
                     if (markSTR.contains("/")) {
                         //we lost focus, so we want to display this as a percentage, but save the fraction
                         fractionMarks.put(currentRowNum, markSTR);
-                        Assessment currentA = course.getAssessment(currentRowNum);
                         //we know currentA is not null because the markET is not empty (it contains "/")
                         markET.setText(formatDecimal(currentA.getMark()));
+                    } else {
+                        //if it doesn't contain a fraction, make sure we remove that from the
+                        //fractions map
+                        fractionMarks.remove(currentRowNum);
                     }
 //                    Assessment currentAss = course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0));
 //                    //change the assessment object
@@ -685,6 +758,7 @@ public class CourseActivity extends AppCompatActivity
         });
         markET.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
+                changed = true;
                 //if there is no mapping for this key
                 Assessment currentA = course.getAssessment(currentRowNum);
                 if (currentA == null) {
@@ -692,7 +766,7 @@ public class CourseActivity extends AppCompatActivity
                     currentA = course.addAssessment(currentRowNum, new Assessment("", 0.0, false, 0.0));
                 }
                 //we want to check if they wrote a fraction or a percentage
-                Double result = 0.0;
+                Double result;
                 String markSTR = s.toString();
                 if (markSTR.contains("/")) {
                     String fraction[] = markSTR.split("/");
@@ -702,9 +776,13 @@ public class CourseActivity extends AppCompatActivity
                         try {
                             Double numerator = Double.parseDouble(fraction[0]);
                             Double denominator = Double.parseDouble(fraction[1]);
-                            result = numerator / denominator * 100;
-                            currentA.setMark(result);
-                            currentA.setMarked(true);
+                            if (denominator.equals(0.0)) {
+                                markET.setError("Not a valid fraction!");
+                            } else {
+                                result = numerator / denominator * 100;
+                                currentA.setMark(result);
+                                currentA.setMarked(true);
+                            }
                         } catch (Exception e) {
                             markET.setError("Not a valid fraction!");
                         }
@@ -712,16 +790,21 @@ public class CourseActivity extends AppCompatActivity
                 } else {
 
                     //change the assessment object
-                    if (!("".equals(markET.getText().toString()))) {
-                        currentA.setMark(Double.valueOf(s.toString()));
-                        currentA.setMarked(true);
-                    } else {
+                    if ("".equals(markET.getText().toString())) {
                         //not marked
                         currentA.setMarked(false);
                         currentA.setMark(0.0);
+                        //if it was a fraction, make sure we remove it
+                        fractionMarks.remove(currentRowNum);
+                    } else {
+                        try {
+                            Double mark = Double.valueOf(s.toString());
+                            currentA.setMark(mark);
+                            currentA.setMarked(true);
+                        } catch (Exception e) {
+                            markET.setError("Not a valid mark!");
+                        }
                     }
-                    //calculateRequiredMark();
-                    //updateTotals();
                 }
                 updateTotals();
             }
@@ -765,6 +848,7 @@ public class CourseActivity extends AppCompatActivity
         });
         worthET.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
+                changed = true;
                 //if there is no mapping for this key
                 Assessment currentA = course.getAssessment(currentRowNum);
                 if (currentA == null) {
@@ -879,30 +963,12 @@ public class CourseActivity extends AppCompatActivity
         stmt.execute();
     }
 
-    public void saveCourse(View view) {
-        if (newCourse) {
-            student.addCourse(course);
-            addCourseToDB();
+    public void saveCourseButton(View view) {
+        if (saveCourse()) {
+            //finish();
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
         }
-        else {
-            //update the course
-            updateCourseInDB();
-        }
-        deleteAllAssessmentsInDB();
-        addAssessmentsToDB();
-        db.close();
-        AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
-        alertDB.setMessage("Saved!");
-        alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                return;
-            }
-        });
-        AlertDialog alert = alertDB.create();
-        alert.show();
-        addDrawerItems();
-        //go home
-        startActivity(new Intent(this, MainActivity.class));
         //add course to sidebar
 //        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 //        mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -915,6 +981,90 @@ public class CourseActivity extends AppCompatActivity
 //        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
     }
 
+    public Boolean saveCourse() {
+        //check if any of the edittexts have errors
+        Boolean noErrors = true;
+        for (int i=1; i<= numRows; i++) {
+            try {
+                //check if the table
+                if (course.getAssessment(i) != null)  {
+                    EditText markET = (EditText) tableLayout.findViewWithTag("your_mark_" + Integer.toString(i));
+                    String markSTR = markET.getText().toString();
+                    if (!("".equals(markSTR))) {
+                        if (fractionMarks.get(i) != null) {
+                            markSTR = fractionMarks.get(i);
+                            String fraction[] = markSTR.split("/");
+                            if (fraction.length != 2) {
+                                noErrors = false;
+                                markET.setError("Not a valid fraction!");
+                            } else {
+                                try {
+                                    Double numerator = Double.parseDouble(fraction[0]);
+                                    Double denominator = Double.parseDouble(fraction[1]);
+                                    if (denominator.equals(0.0)) {
+                                        markET.setError("Not a valid fraction!");
+                                        noErrors = false;
+                                    }
+                                    else {
+                                        Double result = numerator / denominator * 100;
+                                    }
+                                } catch (Exception e) {
+                                    noErrors = false;
+                                    markET.setError("Not a valid fraction!");
+                                }
+                            }
+                        }
+                        else {
+                            Double.valueOf(markET.getText().toString());
+                        }
+                    }
+                }
+            }
+            catch (Exception e) {
+                ((EditText)tableLayout.findViewWithTag("your_mark_" + Integer.toString(i))).setError("Not a valid mark!");
+                noErrors = false;
+            }
+        }
+        if (noErrors) {
+            if (newCourse) {
+                student.addCourse(course);
+                addCourseToDB();
+            } else {
+                //update the course
+                updateCourseInDB();
+            }
+            deleteAllAssessmentsInDB();
+            addAssessmentsToDB();
+            db.close();
+            AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
+            alertDB.setMessage("Saved!");
+            alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    return;
+                }
+            });
+            AlertDialog alert = alertDB.create();
+            alert.show();
+            addDrawerItems();
+            //go home
+//            finish();
+            //startActivity(new Intent(this, MainActivity.class));
+        }
+        else {
+            //tell them to fix their errors before they can save
+            AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
+            alertDB.setMessage("Please make sure all your marks are valid before saving!");
+            alertDB.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    return;
+                }
+            });
+            AlertDialog alert = alertDB.create();
+            alert.show();
+        }
+        return noErrors;
+
+    }
     public void addDrawerItems() {
         ArrayList<Course> courses = student.getCourses();
         String[] courseNames = new String[courses.size() + 1];
@@ -936,10 +1086,11 @@ public class CourseActivity extends AppCompatActivity
     private void selectItem(int position) {
         if (position == 0) {
             //go to main activity
-            Intent i = new Intent(this, MainActivity.class);
-            startActivity(i);
+            saveAndStart(new Intent(this, MainActivity.class));
+//            Intent i = new Intent(this, MainActivity.class);
+//            startActivity(i);
         }
-        else if (position == (student.getCourses().indexOf(course)+1)) {
+        else if (position == (student.getCourseIndex(course.getName())+1)) {
             //they selected the current course, do nothing, just close drawer
             mDrawerLayout.closeDrawers();
         }
@@ -955,7 +1106,8 @@ public class CourseActivity extends AppCompatActivity
             i.putExtras(extras);
             mDrawerLayout.closeDrawer(mDrawerList);
 //            i.putExtra(MainActivity.COURSE_NAME, student.getCourses().get(position).getName());
-            startActivity(i);
+            saveAndStart(i);
+            //startActivity(i);
             // Highlight the selected item, update the title, and close the drawer
         }
     }
@@ -965,5 +1117,33 @@ public class CourseActivity extends AppCompatActivity
         DecimalFormat decimalFormat = new DecimalFormat("0.##");
         String result = decimalFormat.format(Double.valueOf(s));
         return result;
+    }
+
+    public void saveAndStart(final Intent i) {
+        if (changed) {
+            AlertDialog.Builder alertDB = new AlertDialog.Builder(this);
+            alertDB.setMessage("Do you want to save the changes you made to " + course.getName() + "?");
+            alertDB.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    if (saveCourse()) {
+                        //finish();
+                        startActivity(i);
+                        finish();
+                    }
+                }
+            });
+            alertDB.setNegativeButton("Don't Save", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    startActivity(i);
+                    finish();
+                }
+            });
+            AlertDialog alert = alertDB.create();
+            alert.show();
+        }
+        else {
+            startActivity(i);
+            finish();
+        }
     }
 }
