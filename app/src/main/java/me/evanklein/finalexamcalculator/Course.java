@@ -54,7 +54,7 @@ public class Course {
             return 0.0;
         }
         else {
-            currentGrade = mark / markedWorth * 100;
+            currentGrade = mark / Math.min(100,markedWorth) * 100;
             return currentGrade;
         }
     }
@@ -115,7 +115,7 @@ public class Course {
     }
 
     public Course() {
-        assessments = new TreeMap<Integer, Assessment>();
+        assessments = new TreeMap<>();
         name = "";
     }
 }
