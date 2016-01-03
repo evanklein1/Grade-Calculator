@@ -9,8 +9,10 @@ import android.content.Loader;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +20,8 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.DigitsKeyListener;
+import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -107,6 +111,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
         catch (Exception e) {
             displayErrorMessage();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            finish();
         }
     }
 
@@ -227,10 +241,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 //                    if (newName.equals(oldName)) {
 //                        return;
 //                    } else {
-                        //validate the courseName
-                        if (isValid) {
-                            editCourseName(oldName, newName, info.position);
-                        }
+                    //validate the courseName
+                    if (isValid) {
+                        editCourseName(oldName, newName, info.position);
+                    }
 //                    }
                 }
             });
@@ -349,6 +363,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     extras.putString(NEW_COURSE, TRUE);
                     i.putExtras(extras);
                     startActivity(i);
+                    finish();
                     return;
                 }
             }
@@ -363,6 +378,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         alert.show();
     }
 
+    public void launchAddCourse(View view) {
+        Intent i = new Intent(MainActivity.this, AddCourseActivity.class);
+        startActivity(i);
+        finish();
+    }
+
     public void addNewCourseNameListener(final EditText courseET) {
         courseET.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
@@ -372,17 +393,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 if (student.getCourseWithName(courseSTR) != null) {
                     courseET.setError("This course is already in your list of courses! Please enter a different course name.");
                     isValid = false;
-                }
-                else if (courseSTR.equals("")) {
+                } else if (courseSTR.equals("")) {
                     courseET.setError("Please enter a course name.");
                     isValid = false;
-                }
-                else {
+                } else {
                     isValid = true;
                 }
             }
+
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
+
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
@@ -425,12 +446,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         TableRow.LayoutParams newNameLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
         TableRow.LayoutParams newDGLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
         TableRow.LayoutParams newButtonLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+        TableRow.LayoutParams newDelButtonLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
         newNameLayoutParams.column = 0;
         newDGLayoutParams.column = 1;
         newButtonLayoutParams.column = 2;
+        newDelButtonLayoutParams.column = 3;
+        newDelButtonLayoutParams.height = getSizeInDP(40);
+        newDelButtonLayoutParams.width  = getSizeInDP(40);
+        newDelButtonLayoutParams.weight = (float)0.2;
         final TextView newName = new TextView(this);
         final TextView newDG = new TextView(this);
         final Button newButton = new Button(this, null, android.R.attr.buttonStyleSmall);
+        final Button newDelButton = new Button(this, null, android.R.attr.buttonStyleSmall);
         String rowTag = "row_" + Integer.toString(currentRowNum);
         tableRow.setTag(rowTag);
         //set tag and layout params for name
@@ -448,14 +475,29 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         newButton.setLayoutParams(newButtonLayoutParams);
         //set onclick listener for button
         setButtonListener(newButton, currentRowNum);
-            //we want to fill in the values of the edit texts and then disable them
+        //DELETE button
+        String delButtonString = "delete_button_" + Integer.toString(currentRowNum);
+        newDelButton.setTag(delButtonString);
+        newDelButton.setLayoutParams(newDelButtonLayoutParams);
+        newDelButton.setBackgroundColor(Color.TRANSPARENT);
+        newDelButton.setText("X");
+        //set onclick listener for button
+        setDelButtonListener(newDelButton, currentRowNum);
+        //we want to fill in the values of the edit texts and then disable them
         newName.setText(c.getName());
         newDG.setText(formatDecimal(c.getCurrentGrade()) + " %");
         newButton.setText("View");
         tableRow.addView(newName);
         tableRow.addView(newDG);
         tableRow.addView(newButton);
+        tableRow.addView(newDelButton);
+        //added
+
         tableLayout.addView(tableRow, params);
+    }
+
+    public int getSizeInDP(Integer size) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, size, getResources().getDisplayMetrics());
     }
 
     public void setButtonListener(final Button button, final Integer currentRowNum) {
@@ -470,7 +512,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 extras.putString(NEW_COURSE, FALSE);
                 i.putExtras(extras);
                 startActivity(i);
+                finish();
                 return;
+            }
+        });
+    }
+
+    public void setDelButtonListener(final Button button, final Integer currentRowNum) {
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                String courseName = ((TextView)tableLayout.findViewWithTag("name_" + Integer.toString(currentRowNum))).getText().toString();
+                areYouSure(courseName, currentRowNum);
             }
         });
     }
@@ -500,6 +552,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             i.putExtras(extras);
             mDrawerLayout.closeDrawer(mDrawerList);
             startActivity(i);
+            finish();
             // Highlight the selected item, update the title, and close the drawer
         }
     }
