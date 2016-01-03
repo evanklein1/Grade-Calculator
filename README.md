@@ -1,5 +1,6 @@
 # Grade-Calculator
 Grade Calculator is an Android App that lets students enter their grades, marking scheme, and desired final grade for a course, and calculates what they need on the final to get that desired grade.
+
 Link to the app in the Google Play Store:
 https://play.google.com/store/apps/details?id=me.evanklein.finalexamcalculator
 
